@@ -53,7 +53,6 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, '微軟正黑體', sans-serif; user-select: none; }
         
-        /* 解決往上拉出現白邊的問題 */
         html { background-color: var(--bg-top); }
 
         body { 
@@ -81,7 +80,7 @@
         .snowflake:nth-child(9) { left: 85%; animation-duration: 12s, 4s; animation-delay: 2.5s, 1s; font-size: 24px; }
         .snowflake:nth-child(10) { left: 95%; animation-duration: 10s, 3s; animation-delay: 4.5s, 2s; font-size: 18px; }
 
-        .bg-decor { position: fixed; bottom: 120px; right: -20px; opacity: 0.35; pointer-events: none; z-index: 0; width: 220px; }
+        .bg-decor { position: fixed; bottom: 160px; right: -20px; opacity: 0.35; pointer-events: none; z-index: 0; width: 220px; }
 
         .app-container { max-width: 480px; margin: 0 auto; padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: 100px; position: relative; z-index: 1; }
         .page { display: none; animation: fadeIn 0.3s ease-out; }
@@ -129,7 +128,6 @@
         .tx-btn-edit { background-color: #5b9bd5; }
         .tx-btn-del { background-color: #ff7b89; }
         
-        /* 解決透色問題 */
         .tx-item { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; background-color: var(--nav-bg); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .tx-item.swiped { transform: translateX(-130px); } 
 
@@ -181,44 +179,31 @@
         .nav-item svg { width: 24px; height: 24px; fill: currentColor; margin-bottom: 4px; transition: transform 0.2s; }
         .nav-item:active svg { transform: scale(0.9); }
         
-        /* 修正置中的導航加號按鈕 */
         .nav-add { width: 50px; height: 50px; background-color: var(--accent); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: normal; box-shadow: 0 4px 12px rgba(123,202,245,0.4); transition: transform 0.1s; cursor: pointer; padding-bottom: 4px; box-sizing: border-box;}
         .nav-add:active { transform: scale(0.95); }
         body.dark-mode .nav-add { box-shadow: 0 4px 12px rgba(0,0,0,0.5); border: none; }
 
-        /* 隱藏彈出視窗初始狀態 */
+        /* --- 彈窗遮罩核心設定 --- */
         .modal, .calendar-modal, .custom-prompt { display: none !important; }
         .modal.show, .calendar-modal.show, .custom-prompt.show { display: flex !important; }
 
-        /* 全覆蓋且無死角的模糊遮罩 */
-        .modal { 
+        /* 修改為 100dvh，捨棄 -50px 的設定，讓版面更穩定 */
+        .modal, .calendar-modal, .custom-prompt { 
             position: fixed; 
-            top: -50px; 
+            top: 0; 
             left: 0; 
             width: 100vw; 
-            height: calc(100dvh + 50px); 
+            height: 100%; 
+            height: 100dvh; 
             background-color: rgba(0, 0, 0, 0.35); 
             backdrop-filter: blur(8px); 
             -webkit-backdrop-filter: blur(8px); 
-            justify-content: center; 
-            align-items: flex-end; 
             z-index: 1000; 
         }
-
-        .calendar-modal, .custom-prompt { 
-            position: fixed; 
-            top: -50px; 
-            left: 0; 
-            width: 100vw; 
-            height: calc(100dvh + 100px); 
-            background-color: rgba(0, 0, 0, 0.35); 
-            backdrop-filter: blur(8px); 
-            -webkit-backdrop-filter: blur(8px); 
-            justify-content: center; 
-            align-items: center; 
-        }
-        .calendar-modal { z-index: 1100; }
-        .custom-prompt { z-index: 1200; }
+        
+        .modal { justify-content: center; align-items: flex-end; }
+        .calendar-modal { z-index: 1100; justify-content: center; align-items: center; }
+        .custom-prompt { z-index: 1200; justify-content: center; align-items: center; }
         
         .modal-content { 
             position: relative; 
@@ -525,7 +510,7 @@
 
 </div>
 
-<!-- 新的底部導航順序：帳戶、首頁、+、查帳、設置 -->
+<!-- 底部導航 (順序：帳戶、首頁、+、查帳、設置) -->
 <nav class="bottom-nav">
     <div class="nav-item" id="nav-accounts" onclick="switchPage('accounts')">
         <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg><span>帳戶</span>
@@ -736,7 +721,7 @@
     let ledgerRangeDays = 30;
     
     let editingTxId = null;
-    let targetDeleteId = null; // 刪除專用的 ID 記錄
+    let targetDeleteId = null; 
     
     let viewingDate = new Date();
     let calDate = new Date(); 
@@ -751,6 +736,30 @@
     function saveDB() { 
         localStorage.setItem('pure_money_db', JSON.stringify(db)); 
     }
+
+    // --- 動態更新系統狀態列顏色的機制 ---
+    let openModalsCount = 0;
+    function updateThemeMeta() {
+        const metaTheme = document.getElementById('theme-color-meta');
+        const isDark = document.body.classList.contains('dark-mode');
+        // 如果有彈出視窗，就把系統狀態列的顏色變深，與遮罩融合
+        if (openModalsCount > 0) {
+            metaTheme.setAttribute('content', isDark ? '#111b26' : '#6e8fa2');
+        } else {
+            // 沒有視窗時，恢復為正常頂部顏色
+            metaTheme.setAttribute('content', isDark ? '#1a2a3a' : '#aaddf9');
+        }
+    }
+    
+    function trackModal(isOpen) {
+        if (isOpen) {
+            openModalsCount++;
+        } else {
+            openModalsCount = Math.max(0, openModalsCount - 1);
+        }
+        updateThemeMeta();
+    }
+    // ----------------------------------------
 
     function handleUrlParams() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -780,12 +789,16 @@
     function showAlert(msg, callback) {
         document.getElementById('alert-msg').innerText = msg;
         document.getElementById('custom-alert').classList.add('show');
+        trackModal(true);
         document.querySelector('#custom-alert .btn-submit').onclick = () => {
             closeAlert();
             if(callback) setTimeout(callback, 300);
         };
     }
-    function closeAlert() { document.getElementById('custom-alert').classList.remove('show'); }
+    function closeAlert() { 
+        document.getElementById('custom-alert').classList.remove('show'); 
+        trackModal(false);
+    }
 
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.custom-select-wrapper')) {
@@ -845,7 +858,6 @@
         });
     }
 
-    // 依據新導覽列順序 (帳戶、首頁、查帳、設置) 更新左右滑動的順序
     const pagesOrder = ['accounts', 'home', 'ledger', 'settings']; 
     let touchstartX = 0; let touchendX = 0;
     
@@ -877,7 +889,6 @@
     }
     function swMove(e) {}
     
-    // 使用 e.currentTarget 精確處理滑動編輯
     function swEnd(e) {
         let ex = e.changedTouches[0].clientX;
         let ey = e.changedTouches[0].clientY;
@@ -919,18 +930,20 @@
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('show'), 10);
         renderQuickNotes();
+        trackModal(true);
     }
     
-    // 專屬刪除提示窗的邏輯
     function delTx(id) {
         targetDeleteId = id;
         document.getElementById('custom-confirm').classList.add('show');
+        trackModal(true);
     }
 
     function closeConfirmModal() {
         document.getElementById('custom-confirm').classList.remove('show');
         targetDeleteId = null;
         resetAllSwipes();
+        trackModal(false);
     }
 
     function executeDeleteTx() {
@@ -972,8 +985,12 @@
         calDate = new Date(viewingDate);
         renderCalendar();
         document.getElementById('calendar-modal').classList.add('show');
+        trackModal(true);
     }
-    function closeCalendar() { document.getElementById('calendar-modal').classList.remove('show'); }
+    function closeCalendar() { 
+        document.getElementById('calendar-modal').classList.remove('show'); 
+        trackModal(false);
+    }
     function changeCalMonth(offset) {
         calDate.setMonth(calDate.getMonth() + offset);
         renderCalendar();
@@ -1237,8 +1254,12 @@
     function openBudgetModal() {
         document.getElementById('budget-input').value = db.monthlyBudget || '';
         document.getElementById('budget-modal').classList.add('show');
+        trackModal(true);
     }
-    function closeBudgetModal() { document.getElementById('budget-modal').classList.remove('show'); }
+    function closeBudgetModal() { 
+        document.getElementById('budget-modal').classList.remove('show'); 
+        trackModal(false);
+    }
     
     function saveBudget() {
         const val = parseFloat(document.getElementById('budget-input').value);
@@ -1270,12 +1291,17 @@
 
     function applyNote(note) { document.getElementById('tx-note').value = note; }
     function deleteQuickNote(index) { db.quickNotes.splice(index, 1); saveDB(); renderQuickNotes(); }
+    
     function openCustomPrompt() {
         document.getElementById('prompt-input').value = '';
         document.getElementById('custom-prompt').classList.add('show');
         document.getElementById('prompt-input').focus();
+        trackModal(true);
     }
-    function closeCustomPrompt() { document.getElementById('custom-prompt').classList.remove('show'); }
+    function closeCustomPrompt() { 
+        document.getElementById('custom-prompt').classList.remove('show'); 
+        trackModal(false);
+    }
     function submitCustomPrompt() {
         const n = document.getElementById('prompt-input').value;
         if(n && n.trim() !== '') { db.quickNotes.push(n.trim()); saveDB(); renderQuickNotes(); }
@@ -1310,7 +1336,6 @@
                     <div class="tx-btn tx-btn-edit" onclick="editTx(${tx.id})">編輯</div>
                     <div class="tx-btn tx-btn-del" onclick="delTx(${tx.id})">刪除</div>
                 </div>
-                <!-- 傳遞 event 實現更完美的滑動效果 -->
                 <div class="tx-item type-${tx.type}" id="tx-item-${tx.id}" ontouchstart="swStart(event)" ontouchmove="swMove(event)" ontouchend="swEnd(event)">
                     <div class="tx-left">
                         <div class="tx-title">${tx.note}</div>
@@ -1457,13 +1482,11 @@
         }
         
         saveDB(); 
-        
         viewingDate = new Date(); 
         formatViewingDate();
-        
         closeModal();
-        switchPage('home');
         
+        switchPage('home');
         isHistoryExpanded = true;
         document.getElementById('tx-container').classList.add('expanded');
         document.getElementById('history-header').classList.add('open');
@@ -1483,6 +1506,7 @@
         document.getElementById('tx-note').value = '';
         setTxType('expense');
         renderQuickNotes();
+        trackModal(true);
     }
     
     function closeModal(event) {
@@ -1496,6 +1520,7 @@
             setTimeout(() => modal.style.display = 'none', 300);
         }
         editingTxId = null;
+        trackModal(false);
     }
 
     function openAdjustHistoryModal() {
@@ -1531,11 +1556,13 @@
         const modal = document.getElementById('adjust-history-modal');
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('show'), 10);
+        trackModal(true);
     }
     function closeAdjustHistoryModal() {
         const modal = document.getElementById('adjust-history-modal');
         modal.classList.remove('show');
         setTimeout(() => modal.style.display = 'none', 300);
+        trackModal(false);
     }
 
     function openBalanceModal() {
@@ -1547,11 +1574,13 @@
         const modal = document.getElementById('balance-modal');
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('show'), 10);
+        trackModal(true);
     }
     function closeBalanceModal() {
         const modal = document.getElementById('balance-modal');
         modal.classList.remove('show');
         setTimeout(() => modal.style.display = 'none', 300);
+        trackModal(false);
     }
     function saveInitialBalances() {
         const newPost = parseFloat(document.getElementById('init-post').value) || 0;
@@ -1601,27 +1630,19 @@
         reader.readAsText(file);
     }
 
-    // 主題色切換狀態列背景
     function toggleTheme() {
         const body = document.body;
         body.classList.toggle('dark-mode');
-        
-        const metaTheme = document.getElementById('theme-color-meta');
-        if (body.classList.contains('dark-mode')) {
-            metaTheme.setAttribute('content', '#1a2a3a');
-        } else {
-            metaTheme.setAttribute('content', '#aaddf9');
-        }
-        
+        updateThemeMeta();
         localStorage.setItem('pure_money_theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
         renderApp(); 
     }
     
-    // 初始化主題
+    // 初始化時檢查主題並更新狀態列
     if(localStorage.getItem('pure_money_theme') === 'dark') {
         document.body.classList.add('dark-mode');
-        document.getElementById('theme-color-meta').setAttribute('content', '#1a2a3a');
     }
+    updateThemeMeta(); // 確保剛載入時的頂部顏色正確
 
     formatViewingDate();
     handleUrlParams();
