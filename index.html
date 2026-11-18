@@ -8,6 +8,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="純淨記帳">
+    <!-- 新增：動態控制狀態列顏色的 meta 標籤 -->
+    <meta name="theme-color" id="theme-color-meta" content="#aaddf9">
     
     <link rel="apple-touch-icon" href="logo.png">
     <link rel="icon" type="image/png" href="logo.png">
@@ -51,6 +53,9 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, '微軟正黑體', sans-serif; user-select: none; }
         
+        /* 解決往上拉出現白邊的問題 */
+        html { background-color: var(--bg-top); }
+
         body { 
             background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom)); 
             color: var(--text-main);
@@ -60,7 +65,7 @@
             transition: background 0.3s ease;
         }
 
-        .snowflakes { position: fixed; top: -10vh; left: 0; width: 100vw; height: 110vh; pointer-events: none; z-index: -2; overflow: hidden; }
+        .snowflakes { position: fixed; top: -10vh; left: 0; width: 100vw; height: 110vh; pointer-events: none; z-index: 0; overflow: hidden; }
         .snowflake { position: absolute; top: -10vh; color: rgba(255, 255, 255, 0.8); font-family: Arial, sans-serif; cursor: default; animation-name: snowflakes-fall, snowflakes-shake; animation-timing-function: linear, ease-in-out; animation-iteration-count: infinite, infinite; animation-play-state: running, running; }
         body.dark-mode .snowflake { color: rgba(255, 255, 255, 0.15); }
         @keyframes snowflakes-fall { 0% { top: -10vh; } 100% { top: 110vh; } }
@@ -76,9 +81,9 @@
         .snowflake:nth-child(9) { left: 85%; animation-duration: 12s, 4s; animation-delay: 2.5s, 1s; font-size: 24px; }
         .snowflake:nth-child(10) { left: 95%; animation-duration: 10s, 3s; animation-delay: 4.5s, 2s; font-size: 18px; }
 
-        .bg-decor { position: fixed; bottom: 80px; right: -20px; opacity: 0.35; pointer-events: none; z-index: -1; width: 220px; }
+        .bg-decor { position: fixed; bottom: 80px; right: -20px; opacity: 0.35; pointer-events: none; z-index: 0; width: 220px; }
 
-        .app-container { max-width: 480px; margin: 0 auto; padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: 100px; position: relative; }
+        .app-container { max-width: 480px; margin: 0 auto; padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: 100px; position: relative; z-index: 1;}
         .page { display: none; animation: fadeIn 0.3s ease-out; }
         .page.active { display: block; }
 
@@ -124,7 +129,8 @@
         .tx-btn-edit { background-color: #5b9bd5; }
         .tx-btn-del { background-color: #ff7b89; }
         
-        .tx-item { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; background-color: var(--card-bg); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        /* 解決透色問題：將 background-color 設為不透明的 var(--nav-bg) */
+        .tx-item { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; background-color: var(--nav-bg); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .tx-item.swiped { transform: translateX(-130px); } 
 
         .tx-left { display: flex; flex-direction: column; text-align: left; pointer-events: none; justify-content: center;}
@@ -174,19 +180,22 @@
         .nav-item.active { color: var(--accent); }
         .nav-item svg { width: 24px; height: 24px; fill: currentColor; margin-bottom: 4px; transition: transform 0.2s; }
         .nav-item:active svg { transform: scale(0.9); }
-        .nav-add { position: absolute; left: 50%; top: -20px; transform: translateX(-50%); width: 62px; height: 62px; background-color: var(--accent); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: normal; box-shadow: 0 8px 20px rgba(123,202,245,0.4); border: 4px solid var(--nav-bg); transition: border-color 0.3s ease, transform 0.1s; cursor: pointer;}
-        .nav-add:active { transform: translateX(-50%) scale(0.95); }
-        body.dark-mode .nav-add { border-color: var(--nav-bg); box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+        
+        /* 解決導航按鈕平行的問題 (移除絕對定位，調整設計) */
+        .nav-add { width: 50px; height: 50px; background-color: var(--accent); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: normal; box-shadow: 0 4px 12px rgba(123,202,245,0.4); transition: transform 0.1s; cursor: pointer;}
+        .nav-add:active { transform: scale(0.95); }
+        body.dark-mode .nav-add { box-shadow: 0 4px 12px rgba(0,0,0,0.5); border: none; }
 
         /* 隱藏彈出視窗初始狀態，加上 display: none 避免載入時跑出來 */
         .modal, .calendar-modal, .custom-prompt { display: none !important; }
         .modal.show, .calendar-modal.show, .custom-prompt.show { display: flex !important; }
 
-        .modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: flex-end; z-index: 1000; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
-        .modal-content { position: relative; background-color: var(--card-bg); width: 100%; max-width: 480px; border-radius: 30px 30px 0 0; padding: 30px 25px 25px 25px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow: visible; }
+        /* 解決彈窗遮罩未蓋滿與下方被擋住的問題 (加入 100dvh 與安全距離 env) */
+        .modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: flex-end; z-index: 1000; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+        .modal-content { position: relative; background-color: var(--card-bg); width: 100%; max-width: 480px; border-radius: 30px 30px 0 0; padding: 30px 25px calc(25px + env(safe-area-inset-bottom)) 25px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow: visible; }
         .modal.show .modal-content { transform: translateY(0); }
         
-        .modal-body { max-height: 75vh; overflow-y: auto; padding-right: 5px; }
+        .modal-body { max-height: calc(85dvh - 80px); overflow-y: auto; padding-right: 5px; }
         .modal-body::-webkit-scrollbar { width: 5px; }
         .modal-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
 
@@ -297,7 +306,7 @@
         <path d="M50,0 C80,-10 90,-20 110,-15 C125,-5 115,15 95,20 C100,35 80,45 60,30" stroke="#aaddf9" fill="var(--card-bg)"/>
         <path d="M90,5 C80,5 80,15 90,15" stroke="#aaddf9"/>
 
-        <!-- 胖胖星星本體 (左半邊向內凹，強化星星形狀) -->
+        <!-- 胖胖星星本體 -->
         <path d="M -5,-55 
                  C 15,-20 15,-20 35,-15 
                  C 55,-10 70,-10 50,10 
@@ -308,7 +317,7 @@
                  C -15,-25 -20,-20 -5,-55 Z" 
               stroke="#eed17d" fill="var(--card-bg)"/>
         
-        <!-- 可愛表情 :> (拉大間距，確保不黏在一起) -->
+        <!-- 可愛表情 :> -->
         <path d="M -16,5 L -10,20" stroke="#d4ab4a" stroke-width="7"/>
         <path d="M 12,5 L 18,20" stroke="#d4ab4a" stroke-width="7"/>
         <path d="M -8,28 L 1,36 L 10,28" stroke="#d4ab4a" stroke-width="5.5"/>
@@ -513,8 +522,10 @@
         <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>首頁</span>
     </div>
     
-    <div class="nav-item" style="pointer-events:none; opacity:0;"></div> 
-    <div class="nav-add" onclick="openModal()">+</div>
+    <!-- 取代掉原本的透明佔位，使用 flex 讓加號按鈕與其他圖示平行對齊 -->
+    <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
+        <div class="nav-add" onclick="openModal()">+</div>
+    </div>
     
     <div class="nav-item" id="nav-accounts" onclick="switchPage('accounts')">
         <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg><span>帳戶</span>
@@ -838,15 +849,19 @@
         itemStartY = e.touches[0].clientY;
     }
     function swMove(e) {}
-    function swEnd(e, id) {
+    
+    // 解決首頁不能滑動編輯的問題 (使用 e.currentTarget 抓取目標)
+    function swEnd(e) {
         let ex = e.changedTouches[0].clientX;
         let ey = e.changedTouches[0].clientY;
         
+        let currentItem = e.currentTarget;
+        
         if (Math.abs(ex - itemStartX) > Math.abs(ey - itemStartY) && itemStartX - ex > 40) {
             resetAllSwipes(); 
-            document.getElementById('tx-item-' + id).classList.add('swiped');
+            currentItem.classList.add('swiped');
         } else if (ex - itemStartX > 40) {
-            document.getElementById('tx-item-' + id).classList.remove('swiped');
+            currentItem.classList.remove('swiped');
         }
     }
     function resetAllSwipes() {
@@ -1251,13 +1266,14 @@
         const d = new Date(tx.timestamp);
         const dateStr = `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
         
+        // 修改 ontouchend，傳遞 event 而不是 tx.id
         return `
             <div class="tx-item-wrapper" id="tx-wrapper-${tx.id}">
                 <div class="tx-actions">
                     <div class="tx-btn tx-btn-edit" onclick="editTx(${tx.id})">編輯</div>
                     <div class="tx-btn tx-btn-del" onclick="delTx(${tx.id})">刪除</div>
                 </div>
-                <div class="tx-item type-${tx.type}" id="tx-item-${tx.id}" ontouchstart="swStart(event)" ontouchmove="swMove(event)" ontouchend="swEnd(event, ${tx.id})">
+                <div class="tx-item type-${tx.type}" id="tx-item-${tx.id}" ontouchstart="swStart(event)" ontouchmove="swMove(event)" ontouchend="swEnd(event)">
                     <div class="tx-left">
                         <div class="tx-title">${tx.note}</div>
                         <div class="tx-meta">${dateStr} | ${metaText}</div>
@@ -1547,13 +1563,27 @@
         reader.readAsText(file);
     }
 
+    // 加上主題色切換狀態列背景
     function toggleTheme() {
         const body = document.body;
         body.classList.toggle('dark-mode');
+        
+        const metaTheme = document.getElementById('theme-color-meta');
+        if (body.classList.contains('dark-mode')) {
+            metaTheme.setAttribute('content', '#1a2a3a');
+        } else {
+            metaTheme.setAttribute('content', '#aaddf9');
+        }
+        
         localStorage.setItem('pure_money_theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
         renderApp(); 
     }
-    if(localStorage.getItem('pure_money_theme') === 'dark') document.body.classList.add('dark-mode');
+    
+    // 初始化主題
+    if(localStorage.getItem('pure_money_theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('theme-color-meta').setAttribute('content', '#1a2a3a');
+    }
 
     formatViewingDate();
     handleUrlParams();
