@@ -6,9 +6,9 @@
     <title>純淨記帳</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <!-- 關鍵修正：改用 black-translucent 讓網頁內容完全穿透到狀態列下方，完美支援全螢幕模糊遮罩 -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="純淨記帳">
+    <meta name="theme-color" id="theme-color-meta" content="#aaddf9">
     
     <link rel="apple-touch-icon" href="logo.png">
     <link rel="icon" type="image/png" href="logo.png">
@@ -52,14 +52,19 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, '微軟正黑體', sans-serif; user-select: none; }
         
-        html { background-color: var(--bg-top); }
+        /* 鎖定整個畫面高度，防止 iOS 橡皮筋回彈效果扯動導航欄 */
+        html, body { 
+            height: 100%; 
+            height: 100dvh; 
+            overflow: hidden; 
+            background-color: var(--bg-top); 
+            margin: 0; 
+            padding: 0; 
+        }
 
         body { 
             background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom)); 
             color: var(--text-main);
-            min-height: 100vh;
-            min-height: -webkit-fill-available; 
-            overflow-x: hidden;
             transition: background 0.3s ease;
         }
 
@@ -79,9 +84,24 @@
         .snowflake:nth-child(9) { left: 85%; animation-duration: 12s, 4s; animation-delay: 2.5s, 1s; font-size: 24px; }
         .snowflake:nth-child(10) { left: 95%; animation-duration: 10s, 3s; animation-delay: 4.5s, 2s; font-size: 18px; }
 
-        .bg-decor { position: fixed; bottom: 120px; right: -20px; opacity: 0.35; pointer-events: none; z-index: 0; width: 220px; }
+        .bg-decor { position: fixed; bottom: 160px; right: -20px; opacity: 0.35; pointer-events: none; z-index: 0; width: 220px; }
 
-        .app-container { max-width: 480px; margin: 0 auto; padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: 100px; position: relative; z-index: 1; }
+        /* 將內容區塊變成可獨立滾動的容器，與底部導航欄分離 */
+        .app-container { 
+            max-width: 480px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            padding-top: calc(20px + env(safe-area-inset-top)); 
+            padding-bottom: calc(110px + env(safe-area-inset-bottom)); 
+            position: relative; 
+            z-index: 1; 
+            height: 100%; 
+            overflow-y: auto; 
+            overflow-x: hidden; 
+            overscroll-behavior-y: contain; 
+            -webkit-overflow-scrolling: touch; 
+        }
+
         .page { display: none; animation: fadeIn 0.3s ease-out; }
         .page.active { display: block; }
 
@@ -89,7 +109,6 @@
 
         .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 5px 0; }
         
-        /* 聊天泡泡相關 CSS */
         .greeting-wrapper { position: relative; display: flex; align-items: center; }
         .greeting { font-size: 26px; font-weight: 900; color: var(--text-main); letter-spacing: 2px; cursor: pointer; position: relative; } 
         .speech-bubble {
@@ -121,11 +140,7 @@
             border-style: solid;
             border-color: transparent transparent var(--card-bg) transparent;
         }
-        .speech-bubble.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
+        .speech-bubble.show { opacity: 1; visibility: visible; transform: translateY(0); }
 
         .date-selector { display: flex; align-items: center; justify-content: center; gap: 15px; } 
         .date-btn { color: var(--text-main); font-size: 20px; background: none; border: none; font-weight: bold; cursor: pointer; padding: 0 5px; display: flex; align-items: center; height: 100%;}
@@ -324,7 +339,6 @@
         .loader-overlay { display: none !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom)); z-index: 2000; justify-content: center; align-items: center; flex-direction: column; overflow: hidden; }
         .loader-overlay.show { display: flex !important; }
         
-        /* 放大雪花加載圖示 */
         .loader-icon { font-size: 110px; color: var(--text-main); text-align: center; line-height: 110px; animation: naturalSpin 2.5s ease-in-out infinite; position: relative; z-index: 1;}
         @keyframes naturalSpin { 
             0% { transform: rotate(0deg) scale(0.9); opacity: 0.8; } 
@@ -342,7 +356,6 @@
     <div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div>
 </div>
 
-<!-- 重新精細繪製的星星天使背景 -->
 <svg class="bg-decor" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
     <g transform="translate(150, 150) rotate(-8)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6.5">
         <path d="M-80,-60 Q-60,-60 -60,-80 Q-60,-60 -40,-60 Q-60,-60 -60,-40 Q-60,-60 -80,-60 Z" stroke="#aaddf9" fill="#ffffff" opacity="0.8"/>
@@ -367,7 +380,6 @@
 <div class="app-container" id="swipe-container">
     
     <header class="top-header">
-        <!-- 加入包覆層與點擊觸發的對話泡泡 -->
         <div class="greeting-wrapper">
             <div class="greeting" id="greeting-text" onclick="showGreetingBubble()">早安</div>
             <div class="speech-bubble" id="greeting-bubble">希望瑋薇的錢錢都安全躺著！！</div>
@@ -763,7 +775,7 @@
     
     let editingTxId = null;
     let targetDeleteId = null; 
-    let bubbleTimer = null; // 用來記錄對話泡泡的倒數計時器
+    let bubbleTimer = null;
     
     let viewingDate = new Date();
     let calDate = new Date(); 
@@ -777,6 +789,26 @@
 
     function saveDB() { 
         localStorage.setItem('pure_money_db', JSON.stringify(db)); 
+    }
+
+    let openModalsCount = 0;
+    function updateThemeMeta() {
+        const metaTheme = document.getElementById('theme-color-meta');
+        const isDark = document.body.classList.contains('dark-mode');
+        if (openModalsCount > 0) {
+            metaTheme.setAttribute('content', isDark ? '#111b26' : '#6e8fa2');
+        } else {
+            metaTheme.setAttribute('content', isDark ? '#1a2a3a' : '#aaddf9');
+        }
+    }
+    
+    function trackModal(isOpen) {
+        if (isOpen) {
+            openModalsCount++;
+        } else {
+            openModalsCount = Math.max(0, openModalsCount - 1);
+        }
+        updateThemeMeta();
     }
 
     function handleUrlParams() {
@@ -807,6 +839,7 @@
     function showAlert(msg, callback) {
         document.getElementById('alert-msg').innerText = msg;
         document.getElementById('custom-alert').classList.add('show');
+        trackModal(true);
         document.querySelector('#custom-alert .btn-submit').onclick = () => {
             closeAlert();
             if(callback) setTimeout(callback, 300);
@@ -814,6 +847,7 @@
     }
     function closeAlert() { 
         document.getElementById('custom-alert').classList.remove('show'); 
+        trackModal(false);
     }
 
     document.addEventListener('click', function(e) {
@@ -852,16 +886,13 @@
         document.getElementById('greeting-text').innerText = text;
     }
     
-    // 點擊問候語彈出泡泡的專屬函數
     function showGreetingBubble() {
         const bubble = document.getElementById('greeting-bubble');
         bubble.classList.add('show');
-        
         if(bubbleTimer) clearTimeout(bubbleTimer);
-        
         bubbleTimer = setTimeout(() => {
             bubble.classList.remove('show');
-        }, 3000); // 3秒後自動淡出
+        }, 3000); 
     }
 
     function showLoadingAndExecute(action) {
@@ -920,7 +951,6 @@
     function swEnd(e) {
         let ex = e.changedTouches[0].clientX;
         let ey = e.changedTouches[0].clientY;
-        
         let currentItem = e.currentTarget;
         
         if (Math.abs(ex - itemStartX) > Math.abs(ey - itemStartY) && itemStartX - ex > 40) {
@@ -958,17 +988,20 @@
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('show'), 10);
         renderQuickNotes();
+        trackModal(true);
     }
     
     function delTx(id) {
         targetDeleteId = id;
         document.getElementById('custom-confirm').classList.add('show');
+        trackModal(true);
     }
 
     function closeConfirmModal() {
         document.getElementById('custom-confirm').classList.remove('show');
         targetDeleteId = null;
         resetAllSwipes();
+        trackModal(false);
     }
 
     function executeDeleteTx() {
@@ -1010,9 +1043,11 @@
         calDate = new Date(viewingDate);
         renderCalendar();
         document.getElementById('calendar-modal').classList.add('show');
+        trackModal(true);
     }
     function closeCalendar() { 
         document.getElementById('calendar-modal').classList.remove('show'); 
+        trackModal(false);
     }
     function changeCalMonth(offset) {
         calDate.setMonth(calDate.getMonth() + offset);
@@ -1277,9 +1312,11 @@
     function openBudgetModal() {
         document.getElementById('budget-input').value = db.monthlyBudget || '';
         document.getElementById('budget-modal').classList.add('show');
+        trackModal(true);
     }
     function closeBudgetModal() { 
         document.getElementById('budget-modal').classList.remove('show'); 
+        trackModal(false);
     }
     
     function saveBudget() {
@@ -1317,9 +1354,11 @@
         document.getElementById('prompt-input').value = '';
         document.getElementById('custom-prompt').classList.add('show');
         document.getElementById('prompt-input').focus();
+        trackModal(true);
     }
     function closeCustomPrompt() { 
         document.getElementById('custom-prompt').classList.remove('show'); 
+        trackModal(false);
     }
     function submitCustomPrompt() {
         const n = document.getElementById('prompt-input').value;
@@ -1525,6 +1564,7 @@
         document.getElementById('tx-note').value = '';
         setTxType('expense');
         renderQuickNotes();
+        trackModal(true);
     }
     
     function closeModal(event) {
@@ -1538,6 +1578,7 @@
             setTimeout(() => modal.style.display = 'none', 300);
         }
         editingTxId = null;
+        trackModal(false);
     }
 
     function openAdjustHistoryModal() {
@@ -1573,11 +1614,13 @@
         const modal = document.getElementById('adjust-history-modal');
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('show'), 10);
+        trackModal(true);
     }
     function closeAdjustHistoryModal() {
         const modal = document.getElementById('adjust-history-modal');
         modal.classList.remove('show');
         setTimeout(() => modal.style.display = 'none', 300);
+        trackModal(false);
     }
 
     function openBalanceModal() {
@@ -1589,11 +1632,13 @@
         const modal = document.getElementById('balance-modal');
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('show'), 10);
+        trackModal(true);
     }
     function closeBalanceModal() {
         const modal = document.getElementById('balance-modal');
         modal.classList.remove('show');
         setTimeout(() => modal.style.display = 'none', 300);
+        trackModal(false);
     }
     function saveInitialBalances() {
         const newPost = parseFloat(document.getElementById('init-post').value) || 0;
@@ -1646,6 +1691,7 @@
     function toggleTheme() {
         const body = document.body;
         body.classList.toggle('dark-mode');
+        updateThemeMeta();
         localStorage.setItem('pure_money_theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
         renderApp(); 
     }
@@ -1653,6 +1699,7 @@
     if(localStorage.getItem('pure_money_theme') === 'dark') {
         document.body.classList.add('dark-mode');
     }
+    updateThemeMeta(); 
 
     formatViewingDate();
     handleUrlParams();
