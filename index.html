@@ -793,6 +793,16 @@
         localStorage.setItem('pure_money_db', JSON.stringify(db)); 
     }
 
+    function autoBackup() {
+        const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a'); 
+        a.href = URL.createObjectURL(blob);
+        a.download = '記帳備份.json'; // 依照你的要求，把名字改成「記帳備份」
+        document.body.appendChild(a); 
+        a.click(); 
+        document.body.removeChild(a);
+    }
+
     let openModalsCount = 0;
     function updateThemeMeta() {
         const metaTheme = document.getElementById('theme-color-meta');
@@ -1542,6 +1552,7 @@
         }
         
         saveDB(); 
+        autoBackup();
         viewingDate = new Date(); 
         formatViewingDate();
         closeModal();
@@ -1665,7 +1676,7 @@
     function exportData() {
         const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-        a.download = `記帳資料備份_${new Date().toISOString().split('T')[0]}.json`;
+        a.download = '記帳備份.json';
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
         showAlert('資料匯出成功！'); 
     }
