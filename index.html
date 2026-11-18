@@ -81,7 +81,7 @@
         .snowflake:nth-child(9) { left: 85%; animation-duration: 12s, 4s; animation-delay: 2.5s, 1s; font-size: 24px; }
         .snowflake:nth-child(10) { left: 95%; animation-duration: 10s, 3s; animation-delay: 4.5s, 2s; font-size: 18px; }
 
-        .bg-decor { position: fixed; bottom: 80px; right: -20px; opacity: 0.35; pointer-events: none; z-index: 0; width: 220px; }
+        .bg-decor { position: fixed; bottom: 120px; right: -20px; opacity: 0.35; pointer-events: none; z-index: 0; width: 220px; }
 
         .app-container { max-width: 480px; margin: 0 auto; padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: 100px; position: relative; z-index: 1;}
         .page { display: none; animation: fadeIn 0.3s ease-out; }
@@ -182,7 +182,8 @@
         .nav-item:active svg { transform: scale(0.9); }
         
         /* 解決導航按鈕平行的問題 (移除絕對定位，調整設計) */
-        .nav-add { width: 50px; height: 50px; background-color: var(--accent); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: normal; box-shadow: 0 4px 12px rgba(123,202,245,0.4); transition: transform 0.1s; cursor: pointer;}
+        .nav-add { width: 50px; height: 50px; background-color: var(--accent); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: normal; box-shadow: 0 4px 12px rgba(123,202,245,0.4); transition: transform 0.1s; cursor: pointer;padding-bottom: 4px; 
+    box-sizing: border-box;}
         .nav-add:active { transform: scale(0.95); }
         body.dark-mode .nav-add { box-shadow: 0 4px 12px rgba(0,0,0,0.5); border: none; }
 
@@ -278,6 +279,17 @@
         }
         
         .hidden { display: none !important; }
+
+        /* 針對新增記錄視窗取消黑色遮罩與模糊 */
+#add-modal {
+    background-color: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+/* 給予新增視窗一些向上發散的陰影，讓它浮出來 */
+#add-modal .modal-content {
+    box-shadow: 0 -4px 30px rgba(0,0,0,0.15);
+}
     </style>
 </head>
 <body>
@@ -691,7 +703,17 @@
         </div>
     </div>
 </div>
-
+<!-- 自訂 刪除確認視窗 -->
+<div class="custom-prompt" id="custom-confirm">
+    <div class="prompt-content">
+        <h3 style="margin-bottom: 20px; color: var(--text-main);">確定要刪除這筆紀錄嗎？</h3>
+        <div class="prompt-actions">
+            <button class="prompt-cancel" onclick="closeConfirmModal()">取消</button>
+            <!-- 按鈕換成代表刪除的紅色系 -->
+            <button class="prompt-ok" onclick="executeDeleteTx()" style="background: var(--expense); box-shadow: 0 4px 10px rgba(255, 123, 137, 0.3);">刪除</button>
+        </div>
+    </div>
+</div>
 <!-- 自訂 Alert -->
 <div class="custom-prompt" id="custom-alert">
     <div class="prompt-content">
@@ -894,15 +916,30 @@
         renderQuickNotes();
     }
     
-    function delTx(id) {
-        if(confirm('確定要刪除這筆紀錄嗎？')) {
-            db.transactions = db.transactions.filter(t => t.id !== id);
-            saveDB();
-            renderApp();
-        } else {
-            resetAllSwipes();
-        }
+    let targetDeleteId = null;
+
+// 打開專屬刪除確認視窗
+function delTx(id) {
+    targetDeleteId = id;
+    document.getElementById('custom-confirm').classList.add('show');
+}
+
+// 關閉刪除確認視窗
+function closeConfirmModal() {
+    document.getElementById('custom-confirm').classList.remove('show');
+    targetDeleteId = null;
+    resetAllSwipes(); // 順便把左滑的紅色刪除按鈕收回去
+}
+
+// 實際執行刪除動作
+function executeDeleteTx() {
+    if (targetDeleteId !== null) {
+        db.transactions = db.transactions.filter(t => t.id !== targetDeleteId);
+        saveDB();
+        renderApp();
     }
+    closeConfirmModal();
+}
 
     function toggleHistory() {
         const list = document.getElementById('tx-container');
