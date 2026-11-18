@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="純淨記帳">
-    <!-- 新增：動態控制狀態列顏色的 meta 標籤 -->
+    <!-- 動態控制狀態列顏色的 meta 標籤 -->
     <meta name="theme-color" id="theme-color-meta" content="#aaddf9">
     
     <link rel="apple-touch-icon" href="logo.png">
@@ -83,7 +83,7 @@
 
         .bg-decor { position: fixed; bottom: 120px; right: -20px; opacity: 0.35; pointer-events: none; z-index: 0; width: 220px; }
 
-        .app-container { max-width: 480px; margin: 0 auto; padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: 100px; position: relative; z-index: 1;}
+        .app-container { max-width: 480px; margin: 0 auto; padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: 100px; position: relative; z-index: 1; }
         .page { display: none; animation: fadeIn 0.3s ease-out; }
         .page.active { display: block; }
 
@@ -129,7 +129,7 @@
         .tx-btn-edit { background-color: #5b9bd5; }
         .tx-btn-del { background-color: #ff7b89; }
         
-        /* 解決透色問題：將 background-color 設為不透明的 var(--nav-bg) */
+        /* 解決透色問題 */
         .tx-item { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; background-color: var(--nav-bg); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .tx-item.swiped { transform: translateX(-130px); } 
 
@@ -181,19 +181,54 @@
         .nav-item svg { width: 24px; height: 24px; fill: currentColor; margin-bottom: 4px; transition: transform 0.2s; }
         .nav-item:active svg { transform: scale(0.9); }
         
-        /* 解決導航按鈕平行的問題 (移除絕對定位，調整設計) */
-        .nav-add { width: 50px; height: 50px; background-color: var(--accent); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: normal; box-shadow: 0 4px 12px rgba(123,202,245,0.4); transition: transform 0.1s; cursor: pointer;padding-bottom: 4px; 
-    box-sizing: border-box;}
+        /* 修正置中的導航加號按鈕 */
+        .nav-add { width: 50px; height: 50px; background-color: var(--accent); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: normal; box-shadow: 0 4px 12px rgba(123,202,245,0.4); transition: transform 0.1s; cursor: pointer; padding-bottom: 4px; box-sizing: border-box;}
         .nav-add:active { transform: scale(0.95); }
         body.dark-mode .nav-add { box-shadow: 0 4px 12px rgba(0,0,0,0.5); border: none; }
 
-        /* 隱藏彈出視窗初始狀態，加上 display: none 避免載入時跑出來 */
+        /* 隱藏彈出視窗初始狀態 */
         .modal, .calendar-modal, .custom-prompt { display: none !important; }
         .modal.show, .calendar-modal.show, .custom-prompt.show { display: flex !important; }
 
-        /* 解決彈窗遮罩未蓋滿與下方被擋住的問題 (加入 100dvh 與安全距離 env) */
-        .modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: flex-end; z-index: 1000; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
-        .modal-content { position: relative; background-color: var(--card-bg); width: 100%; max-width: 480px; border-radius: 30px 30px 0 0; padding: 30px 25px calc(25px + env(safe-area-inset-bottom)) 25px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow: visible; }
+        /* 全覆蓋且無死角的模糊遮罩 */
+        .modal { 
+            position: fixed; 
+            top: -50px; 
+            left: 0; 
+            width: 100vw; 
+            height: calc(100dvh + 50px); 
+            background-color: rgba(0, 0, 0, 0.35); 
+            backdrop-filter: blur(8px); 
+            -webkit-backdrop-filter: blur(8px); 
+            justify-content: center; 
+            align-items: flex-end; 
+            z-index: 1000; 
+        }
+
+        .calendar-modal, .custom-prompt { 
+            position: fixed; 
+            top: -50px; 
+            left: 0; 
+            width: 100vw; 
+            height: calc(100dvh + 100px); 
+            background-color: rgba(0, 0, 0, 0.35); 
+            backdrop-filter: blur(8px); 
+            -webkit-backdrop-filter: blur(8px); 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .calendar-modal { z-index: 1100; }
+        .custom-prompt { z-index: 1200; }
+        
+        .modal-content { 
+            position: relative; 
+            background-color: var(--card-bg); 
+            width: 100%; max-width: 480px; 
+            border-radius: 30px 30px 0 0; 
+            padding: 30px 25px calc(25px + env(safe-area-inset-bottom)) 25px; 
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            overflow: visible; 
+        }
         .modal.show .modal-content { transform: translateY(0); }
         
         .modal-body { max-height: calc(85dvh - 80px); overflow-y: auto; padding-right: 5px; }
@@ -242,7 +277,17 @@
         .history-record-time { font-size: 12px; color: var(--text-light); margin-bottom: 5px; font-weight: bold; }
         .history-record-detail { font-size: 14px; font-weight: bold; color: var(--text-main); line-height: 1.4; }
 
-        .calendar-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1100; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+        .prompt-content { background: var(--card-bg); width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transform: scale(0.9); opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .custom-prompt.show .prompt-content { transform: scale(1); opacity: 1; }
+        .prompt-content h3 { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: var(--text-main); }
+        .prompt-content input { width: 100%; padding: 12px; border: 1.5px solid var(--border-color); border-radius: 12px; margin-bottom: 20px; font-size: 15px; background: transparent; color: var(--text-main); outline: none; text-align: center;}
+        .prompt-content input:focus { border-color: var(--accent); }
+        .prompt-actions { display: flex; gap: 10px; }
+        .prompt-actions button { flex: 1; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 15px; cursor: pointer; border: none; transition: 0.2s; }
+        .prompt-cancel { background: var(--border-color); color: var(--text-main); }
+        .prompt-ok { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(123,202,245,0.3); }
+        .prompt-ok:active { transform: scale(0.95); }
+
         .calendar-content { background: var(--calendar-bg); width: 90%; max-width: 320px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .calendar-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: var(--calendar-header); color: var(--calendar-text); }
         .calendar-header button { background: none; border: none; font-size: 18px; color: var(--calendar-text); cursor: pointer; font-weight: bold; padding: 5px 10px; }
@@ -256,19 +301,6 @@
         .cal-day.today { border: 1.5px solid var(--calendar-today-border); }
         .calendar-close-btn { width: calc(100% - 40px); margin: 0 20px 20px 20px; padding: 12px; border-radius: 12px; border: none; background: var(--border-color); color: var(--text-main); font-weight: bold; cursor: pointer; transition: background 0.2s; }
 
-        .custom-prompt { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1200; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
-        .prompt-content { background: var(--card-bg); width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transform: scale(0.9); opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .custom-prompt.show .prompt-content { transform: scale(1); opacity: 1; }
-        .prompt-content h3 { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: var(--text-main); }
-        .prompt-content input { width: 100%; padding: 12px; border: 1.5px solid var(--border-color); border-radius: 12px; margin-bottom: 20px; font-size: 15px; background: transparent; color: var(--text-main); outline: none; text-align: center;}
-        .prompt-content input:focus { border-color: var(--accent); }
-        .prompt-actions { display: flex; gap: 10px; }
-        .prompt-actions button { flex: 1; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 15px; cursor: pointer; border: none; transition: 0.2s; }
-        .prompt-cancel { background: var(--border-color); color: var(--text-main); }
-        .prompt-ok { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(123,202,245,0.3); }
-        .prompt-ok:active { transform: scale(0.95); }
-
-        /* 確保 Loading 畫面預設隱藏，加入 display: none !important */
         .loader-overlay { display: none !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom)); z-index: 2000; justify-content: center; align-items: center; flex-direction: column; overflow: hidden; }
         .loader-overlay.show { display: flex !important; }
         .loader-icon { font-size: 65px; color: var(--text-main); text-align: center; line-height: 65px; animation: naturalSpin 2.5s ease-in-out infinite; position: relative; z-index: 1;}
@@ -279,17 +311,6 @@
         }
         
         .hidden { display: none !important; }
-
-        /* 針對新增記錄視窗取消黑色遮罩與模糊 */
-#add-modal {
-    background-color: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-}
-/* 給予新增視窗一些向上發散的陰影，讓它浮出來 */
-#add-modal .modal-content {
-    box-shadow: 0 -4px 30px rgba(0,0,0,0.15);
-}
     </style>
 </head>
 <body>
@@ -302,34 +323,15 @@
 <!-- 重新精細繪製的星星天使背景 -->
 <svg class="bg-decor" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
     <g transform="translate(150, 150) rotate(-8)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6.5">
-        <!-- 閃爍小星星 -->
         <path d="M-80,-60 Q-60,-60 -60,-80 Q-60,-60 -40,-60 Q-60,-60 -60,-40 Q-60,-60 -80,-60 Z" stroke="#aaddf9" fill="#ffffff" opacity="0.8"/>
         <path d="M60,70 Q75,70 75,55 Q75,70 90,70 Q75,70 75,85 Q75,70 60,70 Z" stroke="#aaddf9" fill="#ffffff" opacity="0.8"/>
         <path d="M-50,110 Q-35,110 -35,95 Q-35,110 -20,110 Q-35,110 -35,125 Q-35,110 -50,110 Z" stroke="#aaddf9" fill="#ffffff" opacity="0.8"/>
-        
-        <!-- 天使光環 -->
         <ellipse cx="0" cy="-80" rx="35" ry="12" stroke="#aaddf9" transform="rotate(-10 0 -80)"/>
-        
-        <!-- 左翅膀 -->
         <path d="M-50,10 C-80,0 -90,-10 -110,-5 C-125,5 -115,25 -95,30 C-100,45 -80,55 -60,40" stroke="#aaddf9" fill="var(--card-bg)"/>
         <path d="M-90,15 C-80,15 -80,25 -90,25" stroke="#aaddf9"/>
-        
-        <!-- 右翅膀 -->
         <path d="M50,0 C80,-10 90,-20 110,-15 C125,-5 115,15 95,20 C100,35 80,45 60,30" stroke="#aaddf9" fill="var(--card-bg)"/>
         <path d="M90,5 C80,5 80,15 90,15" stroke="#aaddf9"/>
-
-        <!-- 胖胖星星本體 -->
-        <path d="M -5,-55 
-                 C 15,-20 15,-20 35,-15 
-                 C 55,-10 70,-10 50,10 
-                 C 35,25 40,30 45,55 
-                 C 50,70 25,50 0,60 
-                 C -20,65 -30,50 -35,35 
-                 C -40,15 -55,0 -30,-15 
-                 C -15,-25 -20,-20 -5,-55 Z" 
-              stroke="#eed17d" fill="var(--card-bg)"/>
-        
-        <!-- 可愛表情 :> -->
+        <path d="M -5,-55 C 15,-20 15,-20 35,-15 C 55,-10 70,-10 50,10 C 35,25 40,30 45,55 C 50,70 25,50 0,60 C -20,65 -30,50 -35,35 C -40,15 -55,0 -30,-15 C -15,-25 -20,-20 -5,-55 Z" stroke="#eed17d" fill="var(--card-bg)"/>
         <path d="M -16,5 L -10,20" stroke="#d4ab4a" stroke-width="7"/>
         <path d="M 12,5 L 18,20" stroke="#d4ab4a" stroke-width="7"/>
         <path d="M -8,28 L 1,36 L 10,28" stroke="#d4ab4a" stroke-width="5.5"/>
@@ -351,70 +353,34 @@
         </div>
     </header>
 
-    <!-- 左一：查帳頁 -->
-    <div class="page" id="page-ledger">
-        <h2 style="text-align: center; margin-bottom: 15px; font-weight: bold; color: var(--text-main);">收支總覽</h2>
-        
-        <div class="ledger-summary">
-            <div class="ledger-summary-item">
-                <span class="label" id="ledger-expense-label">本月總支出</span>
-                <span class="amount expense" id="ledger-month-expense">0</span>
+    <!-- 左一：帳戶頁 -->
+    <div class="page" id="page-accounts">
+        <h2 style="text-align: center; margin-bottom: 10px; font-weight: bold; color: var(--text-main);">帳戶總覽</h2>
+        <p style="font-size: 13px; color: var(--text-light); text-align: center; margin-bottom: 20px; line-height: 1.6;">
+            為避免漏記帳導致「錢莫名其妙不見」<br>請定期檢查真實餘額並進行校正。
+        </p>
+        <div class="accounts-grid">
+            <div class="account-card">
+                <div class="account-card-name">郵局</div>
+                <div class="account-card-value" style="color: #7bcaf5;" id="acc-post-val">0</div>
             </div>
-            <div class="ledger-summary-item">
-                <span class="label" id="ledger-income-label">本月總收入</span>
-                <span class="amount income" id="ledger-month-income">0</span>
+            <div class="account-card">
+                <div class="account-card-name">現金</div>
+                <div class="account-card-value" style="color: #ffb6c1;" id="acc-cash-val">0</div>
             </div>
-        </div>
-
-        <div class="chart-card">
-            <div class="chart-card-header">
-                <span class="chart-card-title">消費趨勢</span>
-                <div class="time-range-btns">
-                    <button class="time-btn" id="btn-range-7" onclick="setLedgerRange(7)">7天</button>
-                    <button class="time-btn" id="btn-range-15" onclick="setLedgerRange(15)">半月</button>
-                    <button class="time-btn active" id="btn-range-30" onclick="setLedgerRange(30)">本月</button>
-                    <button class="time-btn" id="btn-range-365" onclick="setLedgerRange(365)">本年</button>
-                </div>
+            <div class="account-card">
+                <div class="account-card-name">街口</div>
+                <div class="account-card-value" style="color: #f1a9a0;" id="acc-jko-val">0</div>
             </div>
-            <div class="line-chart-container">
-                <canvas id="lineChart"></canvas>
-            </div>
-            <div class="chart-description" id="chart-desc"></div>
-        </div>
-
-        <div class="ledger-filter-bar">
-            <!-- 搜尋列移除表情符號 -->
-            <div class="ledger-filter-row" style="margin-bottom: 5px;">
-                <span class="ledger-filter-title">交易明細</span>
-                <input type="text" id="ledger-search" class="search-input" placeholder="搜尋備註..." oninput="renderApp()">
-            </div>
-            <div class="ledger-filter-row" style="justify-content: flex-end;">
-                <div class="ledger-filter-controls">
-                    <div class="custom-select-wrapper inline" id="ledger-filter-wrapper">
-                        <div class="custom-select inline" onclick="toggleSelect('ledger-filter-wrapper')">全部</div>
-                        <div class="custom-options">
-                            <div class="custom-option selected" onclick="selectOption('ledger-filter-wrapper', 'all', '全部', renderApp)">全部</div>
-                            <div class="custom-option" onclick="selectOption('ledger-filter-wrapper', 'expense', '支出', renderApp)">支出</div>
-                            <div class="custom-option" onclick="selectOption('ledger-filter-wrapper', 'income', '收入', renderApp)">收入</div>
-                            <div class="custom-option" onclick="selectOption('ledger-filter-wrapper', 'transfer', '轉帳', renderApp)">轉帳</div>
-                        </div>
-                        <input type="hidden" id="ledger-filter" value="all">
-                    </div>
-                    <div class="custom-select-wrapper inline" id="ledger-sort-wrapper">
-                        <div class="custom-select inline" onclick="toggleSelect('ledger-sort-wrapper')">新到舊</div>
-                        <div class="custom-options">
-                            <div class="custom-option selected" onclick="selectOption('ledger-sort-wrapper', 'date-desc', '新到舊', renderApp)">新到舊</div>
-                            <div class="custom-option" onclick="selectOption('ledger-sort-wrapper', 'date-asc', '舊到新', renderApp)">舊到新</div>
-                            <div class="custom-option" onclick="selectOption('ledger-sort-wrapper', 'amount-desc', '高到低', renderApp)">高到低</div>
-                            <div class="custom-option" onclick="selectOption('ledger-sort-wrapper', 'amount-asc', '低到高', renderApp)">低到高</div>
-                        </div>
-                        <input type="hidden" id="ledger-sort" value="date-desc">
-                    </div>
-                </div>
+            <div class="account-card">
+                <div class="account-card-name">悠游卡</div>
+                <div class="account-card-value" style="color: #b8c0ff;" id="acc-easy-val">0</div>
             </div>
         </div>
-
-        <section class="tx-list expanded" id="ledger-tx-container"></section>
+        <div class="action-buttons" style="margin-top: 25px;">
+            <button class="btn-cancel" onclick="openAdjustHistoryModal()">查看校正記錄</button>
+            <button class="btn-submit" onclick="openBalanceModal()">進行餘額校正</button>
+        </div>
     </div>
 
     <!-- 左二：首頁 (預設顯示) -->
@@ -425,7 +391,6 @@
             <div class="chart-container">
                 <canvas id="myChart"></canvas>
             </div>
-            <!-- 自訂圖例區塊 -->
             <div class="pie-legend" id="pie-legend"></div>
         </div>
 
@@ -470,34 +435,69 @@
         <section class="tx-list expanded" id="tx-container"></section>
     </div>
 
-    <!-- 左三：帳戶頁 -->
-    <div class="page" id="page-accounts">
-        <h2 style="text-align: center; margin-bottom: 10px; font-weight: bold; color: var(--text-main);">帳戶總覽</h2>
-        <p style="font-size: 13px; color: var(--text-light); text-align: center; margin-bottom: 20px; line-height: 1.6;">
-            為避免漏記帳導致「錢莫名其妙不見」<br>請定期檢查真實餘額並進行校正。
-        </p>
-        <div class="accounts-grid">
-            <div class="account-card">
-                <div class="account-card-name">郵局</div>
-                <div class="account-card-value" style="color: #7bcaf5;" id="acc-post-val">0</div>
+    <!-- 左三：查帳頁 -->
+    <div class="page" id="page-ledger">
+        <h2 style="text-align: center; margin-bottom: 15px; font-weight: bold; color: var(--text-main);">收支總覽</h2>
+        
+        <div class="ledger-summary">
+            <div class="ledger-summary-item">
+                <span class="label" id="ledger-expense-label">本月總支出</span>
+                <span class="amount expense" id="ledger-month-expense">0</span>
             </div>
-            <div class="account-card">
-                <div class="account-card-name">現金</div>
-                <div class="account-card-value" style="color: #ffb6c1;" id="acc-cash-val">0</div>
-            </div>
-            <div class="account-card">
-                <div class="account-card-name">街口</div>
-                <div class="account-card-value" style="color: #f1a9a0;" id="acc-jko-val">0</div>
-            </div>
-            <div class="account-card">
-                <div class="account-card-name">悠游卡</div>
-                <div class="account-card-value" style="color: #b8c0ff;" id="acc-easy-val">0</div>
+            <div class="ledger-summary-item">
+                <span class="label" id="ledger-income-label">本月總收入</span>
+                <span class="amount income" id="ledger-month-income">0</span>
             </div>
         </div>
-        <div class="action-buttons" style="margin-top: 25px;">
-            <button class="btn-cancel" onclick="openAdjustHistoryModal()">查看校正記錄</button>
-            <button class="btn-submit" onclick="openBalanceModal()">進行餘額校正</button>
+
+        <div class="chart-card">
+            <div class="chart-card-header">
+                <span class="chart-card-title">消費趨勢</span>
+                <div class="time-range-btns">
+                    <button class="time-btn" id="btn-range-7" onclick="setLedgerRange(7)">7天</button>
+                    <button class="time-btn" id="btn-range-15" onclick="setLedgerRange(15)">半月</button>
+                    <button class="time-btn active" id="btn-range-30" onclick="setLedgerRange(30)">本月</button>
+                    <button class="time-btn" id="btn-range-365" onclick="setLedgerRange(365)">本年</button>
+                </div>
+            </div>
+            <div class="line-chart-container">
+                <canvas id="lineChart"></canvas>
+            </div>
+            <div class="chart-description" id="chart-desc"></div>
         </div>
+
+        <div class="ledger-filter-bar">
+            <div class="ledger-filter-row" style="margin-bottom: 5px;">
+                <span class="ledger-filter-title">交易明細</span>
+                <input type="text" id="ledger-search" class="search-input" placeholder="搜尋備註..." oninput="renderApp()">
+            </div>
+            <div class="ledger-filter-row" style="justify-content: flex-end;">
+                <div class="ledger-filter-controls">
+                    <div class="custom-select-wrapper inline" id="ledger-filter-wrapper">
+                        <div class="custom-select inline" onclick="toggleSelect('ledger-filter-wrapper')">全部</div>
+                        <div class="custom-options">
+                            <div class="custom-option selected" onclick="selectOption('ledger-filter-wrapper', 'all', '全部', renderApp)">全部</div>
+                            <div class="custom-option" onclick="selectOption('ledger-filter-wrapper', 'expense', '支出', renderApp)">支出</div>
+                            <div class="custom-option" onclick="selectOption('ledger-filter-wrapper', 'income', '收入', renderApp)">收入</div>
+                            <div class="custom-option" onclick="selectOption('ledger-filter-wrapper', 'transfer', '轉帳', renderApp)">轉帳</div>
+                        </div>
+                        <input type="hidden" id="ledger-filter" value="all">
+                    </div>
+                    <div class="custom-select-wrapper inline" id="ledger-sort-wrapper">
+                        <div class="custom-select inline" onclick="toggleSelect('ledger-sort-wrapper')">新到舊</div>
+                        <div class="custom-options">
+                            <div class="custom-option selected" onclick="selectOption('ledger-sort-wrapper', 'date-desc', '新到舊', renderApp)">新到舊</div>
+                            <div class="custom-option" onclick="selectOption('ledger-sort-wrapper', 'date-asc', '舊到新', renderApp)">舊到新</div>
+                            <div class="custom-option" onclick="selectOption('ledger-sort-wrapper', 'amount-desc', '高到低', renderApp)">高到低</div>
+                            <div class="custom-option" onclick="selectOption('ledger-sort-wrapper', 'amount-asc', '低到高', renderApp)">低到高</div>
+                        </div>
+                        <input type="hidden" id="ledger-sort" value="date-desc">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="tx-list expanded" id="ledger-tx-container"></section>
     </div>
 
     <!-- 最右：設置頁 -->
@@ -525,23 +525,24 @@
 
 </div>
 
-<!-- 底部導航 -->
+<!-- 新的底部導航順序：帳戶、首頁、+、查帳、設置 -->
 <nav class="bottom-nav">
-    <div class="nav-item" id="nav-ledger" onclick="switchPage('ledger')">
-        <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg><span>查帳</span>
+    <div class="nav-item" id="nav-accounts" onclick="switchPage('accounts')">
+        <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg><span>帳戶</span>
     </div>
+    
     <div class="nav-item active" id="nav-home" onclick="switchPage('home')">
         <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>首頁</span>
     </div>
     
-    <!-- 取代掉原本的透明佔位，使用 flex 讓加號按鈕與其他圖示平行對齊 -->
     <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
         <div class="nav-add" onclick="openModal()">+</div>
     </div>
     
-    <div class="nav-item" id="nav-accounts" onclick="switchPage('accounts')">
-        <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg><span>帳戶</span>
+    <div class="nav-item" id="nav-ledger" onclick="switchPage('ledger')">
+        <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg><span>查帳</span>
     </div>
+    
     <div class="nav-item" id="nav-settings" onclick="switchPage('settings')">
         <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg><span>設置</span>
     </div>
@@ -550,7 +551,6 @@
 <!-- 新增/編輯交易視窗 -->
 <div class="modal" id="add-modal" onclick="closeModal(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
-        
         <svg class="modal-decor" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" style="top: -65px; width: 190px;">
             <path d="M 50,150 C 30,150 20,130 30,110 C 10,100 10,60 50,50 C 60,30 90,20 120,30 C 140,0 200,0 240,20 C 270,10 320,20 330,50 C 360,50 390,70 380,100 C 390,120 370,150 350,150 Z" fill="#ffffff" stroke="#aaddf9" stroke-width="4" stroke-linejoin="round"/>
             <path d="M 280,40 C 280,20 320,20 320,40 C 320,60 300,70 280,60" fill="none" stroke="#aaddf9" stroke-width="4" stroke-linecap="round"/>
@@ -636,6 +636,17 @@
     </div>
 </div>
 
+<!-- 自訂 刪除確認視窗 -->
+<div class="custom-prompt" id="custom-confirm">
+    <div class="prompt-content">
+        <h3 style="margin-bottom: 20px; color: var(--text-main);">確定要刪除這筆紀錄嗎？</h3>
+        <div class="prompt-actions">
+            <button class="prompt-cancel" onclick="closeConfirmModal()">取消</button>
+            <button class="prompt-ok" onclick="executeDeleteTx()" style="background: var(--expense); box-shadow: 0 4px 10px rgba(255, 123, 137, 0.3);">刪除</button>
+        </div>
+    </div>
+</div>
+
 <!-- 預算設定視窗 -->
 <div class="custom-prompt" id="budget-modal">
     <div class="prompt-content">
@@ -703,17 +714,7 @@
         </div>
     </div>
 </div>
-<!-- 自訂 刪除確認視窗 -->
-<div class="custom-prompt" id="custom-confirm">
-    <div class="prompt-content">
-        <h3 style="margin-bottom: 20px; color: var(--text-main);">確定要刪除這筆紀錄嗎？</h3>
-        <div class="prompt-actions">
-            <button class="prompt-cancel" onclick="closeConfirmModal()">取消</button>
-            <!-- 按鈕換成代表刪除的紅色系 -->
-            <button class="prompt-ok" onclick="executeDeleteTx()" style="background: var(--expense); box-shadow: 0 4px 10px rgba(255, 123, 137, 0.3);">刪除</button>
-        </div>
-    </div>
-</div>
+
 <!-- 自訂 Alert -->
 <div class="custom-prompt" id="custom-alert">
     <div class="prompt-content">
@@ -735,6 +736,7 @@
     let ledgerRangeDays = 30;
     
     let editingTxId = null;
+    let targetDeleteId = null; // 刪除專用的 ID 記錄
     
     let viewingDate = new Date();
     let calDate = new Date(); 
@@ -843,13 +845,16 @@
         });
     }
 
-    const pagesOrder = ['ledger', 'home', 'accounts', 'settings']; 
+    // 依據新導覽列順序 (帳戶、首頁、查帳、設置) 更新左右滑動的順序
+    const pagesOrder = ['accounts', 'home', 'ledger', 'settings']; 
     let touchstartX = 0; let touchendX = 0;
+    
     document.getElementById('swipe-container').addEventListener('touchstart', e => { 
         if(!e.target.closest('.tx-item')) {
             touchstartX = e.changedTouches[0].screenX; 
         }
     });
+    
     document.getElementById('swipe-container').addEventListener('touchend', e => {
         if(!e.target.closest('.tx-item') && touchstartX !== 0) {
             touchendX = e.changedTouches[0].screenX;
@@ -872,7 +877,7 @@
     }
     function swMove(e) {}
     
-    // 解決首頁不能滑動編輯的問題 (使用 e.currentTarget 抓取目標)
+    // 使用 e.currentTarget 精確處理滑動編輯
     function swEnd(e) {
         let ex = e.changedTouches[0].clientX;
         let ey = e.changedTouches[0].clientY;
@@ -916,30 +921,26 @@
         renderQuickNotes();
     }
     
-    let targetDeleteId = null;
-
-// 打開專屬刪除確認視窗
-function delTx(id) {
-    targetDeleteId = id;
-    document.getElementById('custom-confirm').classList.add('show');
-}
-
-// 關閉刪除確認視窗
-function closeConfirmModal() {
-    document.getElementById('custom-confirm').classList.remove('show');
-    targetDeleteId = null;
-    resetAllSwipes(); // 順便把左滑的紅色刪除按鈕收回去
-}
-
-// 實際執行刪除動作
-function executeDeleteTx() {
-    if (targetDeleteId !== null) {
-        db.transactions = db.transactions.filter(t => t.id !== targetDeleteId);
-        saveDB();
-        renderApp();
+    // 專屬刪除提示窗的邏輯
+    function delTx(id) {
+        targetDeleteId = id;
+        document.getElementById('custom-confirm').classList.add('show');
     }
-    closeConfirmModal();
-}
+
+    function closeConfirmModal() {
+        document.getElementById('custom-confirm').classList.remove('show');
+        targetDeleteId = null;
+        resetAllSwipes();
+    }
+
+    function executeDeleteTx() {
+        if (targetDeleteId !== null) {
+            db.transactions = db.transactions.filter(t => t.id !== targetDeleteId);
+            saveDB();
+            renderApp();
+        }
+        closeConfirmModal();
+    }
 
     function toggleHistory() {
         const list = document.getElementById('tx-container');
@@ -1303,13 +1304,13 @@ function executeDeleteTx() {
         const d = new Date(tx.timestamp);
         const dateStr = `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
         
-        // 修改 ontouchend，傳遞 event 而不是 tx.id
         return `
             <div class="tx-item-wrapper" id="tx-wrapper-${tx.id}">
                 <div class="tx-actions">
                     <div class="tx-btn tx-btn-edit" onclick="editTx(${tx.id})">編輯</div>
                     <div class="tx-btn tx-btn-del" onclick="delTx(${tx.id})">刪除</div>
                 </div>
+                <!-- 傳遞 event 實現更完美的滑動效果 -->
                 <div class="tx-item type-${tx.type}" id="tx-item-${tx.id}" ontouchstart="swStart(event)" ontouchmove="swMove(event)" ontouchend="swEnd(event)">
                     <div class="tx-left">
                         <div class="tx-title">${tx.note}</div>
@@ -1600,7 +1601,7 @@ function executeDeleteTx() {
         reader.readAsText(file);
     }
 
-    // 加上主題色切換狀態列背景
+    // 主題色切換狀態列背景
     function toggleTheme() {
         const body = document.body;
         body.classList.toggle('dark-mode');
