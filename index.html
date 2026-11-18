@@ -6,8 +6,7 @@
     <title>純淨記帳</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <!-- 將狀態列樣式設為透明，讓背景色可以延伸到最上方 -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="純淨記帳">
     
     <link rel="apple-touch-icon" href="logo.png">
@@ -52,11 +51,6 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, '微軟正黑體', sans-serif; user-select: none; }
         
-        /* 修復頂部白邊：使用 min-height: 100vh 並確保背景色延伸 */
-        html, body {
-            background-color: var(--bg-top); 
-            height: 100%;
-        }
         body { 
             background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom)); 
             color: var(--text-main);
@@ -64,8 +58,6 @@
             min-height: -webkit-fill-available; 
             overflow-x: hidden;
             transition: background 0.3s ease;
-            margin: 0;
-            padding: 0;
         }
 
         .snowflakes { position: fixed; top: -10vh; left: 0; width: 100vw; height: 110vh; pointer-events: none; z-index: -2; overflow: hidden; }
@@ -86,8 +78,7 @@
 
         .bg-decor { position: fixed; bottom: 80px; right: -20px; opacity: 0.35; pointer-events: none; z-index: -1; width: 220px; }
 
-        /* 使用 env(safe-area-inset-top) 將內容往下推，避免被瀏海遮住，但背景色依然在 */
-        .app-container { max-width: 480px; margin: 0 auto; padding: 20px; padding-top: calc(15px + env(safe-area-inset-top)); padding-bottom: 90px; position: relative; }
+        .app-container { max-width: 480px; margin: 0 auto; padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: 100px; position: relative; }
         .page { display: none; animation: fadeIn 0.3s ease-out; }
         .page.active { display: block; }
 
@@ -178,28 +169,24 @@
         .settings-card button:active { transform: scale(0.95); }
         .settings-title { font-size: 16px; font-weight: bold; }
 
-        /* 導航列調整：降低高度、移除突出，讓加號按鈕與其他圖示平行 */
-        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--nav-bg); display: flex; justify-content: space-around; align-items: center; padding: 8px 0; padding-bottom: calc(8px + env(safe-area-inset-bottom)); box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 100; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: bold; color: var(--text-light); cursor: pointer; transition: color 0.2s; }
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--nav-bg); display: flex; justify-content: space-around; align-items: center; padding: 10px 0; padding-bottom: calc(10px + env(safe-area-inset-bottom)); box-shadow: 0 -4px 20px rgba(0,0,0,0.08); border-radius: 24px 24px 0 0; z-index: 100; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: bold; color: var(--text-light); cursor: pointer; }
         .nav-item.active { color: var(--accent); }
-        .nav-item svg { width: 22px; height: 22px; fill: currentColor; margin-bottom: 4px; transition: transform 0.2s; }
+        .nav-item svg { width: 24px; height: 24px; fill: currentColor; margin-bottom: 4px; transition: transform 0.2s; }
         .nav-item:active svg { transform: scale(0.9); }
-        
-        /* 加號按鈕改為平行內嵌 */
-        .nav-add { width: 44px; height: 44px; background-color: var(--accent); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: normal; cursor: pointer; transition: transform 0.1s; box-shadow: 0 4px 10px rgba(123,202,245,0.4); margin: 0 5px;}
-        .nav-add:active { transform: scale(0.9); }
+        .nav-add { position: absolute; left: 50%; top: -20px; transform: translateX(-50%); width: 62px; height: 62px; background-color: var(--accent); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: normal; box-shadow: 0 8px 20px rgba(123,202,245,0.4); border: 4px solid var(--nav-bg); transition: border-color 0.3s ease, transform 0.1s; cursor: pointer;}
+        .nav-add:active { transform: translateX(-50%) scale(0.95); }
+        body.dark-mode .nav-add { border-color: var(--nav-bg); box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
 
-        /* 隱藏彈出視窗初始狀態，確保電腦版不會跑出來 */
+        /* 隱藏彈出視窗初始狀態，加上 display: none 避免載入時跑出來 */
         .modal, .calendar-modal, .custom-prompt { display: none !important; }
         .modal.show, .calendar-modal.show, .custom-prompt.show { display: flex !important; }
 
-        /* 彈出視窗調整，修復黑霧沒蓋滿與跑版問題 */
         .modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: flex-end; z-index: 1000; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
-        .modal-content-wrapper { position: relative; width: 100%; max-width: 480px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .modal.show .modal-content-wrapper { transform: translateY(0); }
+        .modal-content { position: relative; background-color: var(--card-bg); width: 100%; max-width: 480px; border-radius: 30px 30px 0 0; padding: 30px 25px 25px 25px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow: visible; }
+        .modal.show .modal-content { transform: translateY(0); }
         
-        .modal-content { background-color: var(--card-bg); border-radius: 30px 30px 0 0; padding: 30px 25px 25px 25px; padding-bottom: calc(25px + env(safe-area-inset-bottom)); position: relative; overflow: hidden; }
-        .modal-body { max-height: 70vh; overflow-y: auto; padding-right: 5px; }
+        .modal-body { max-height: 75vh; overflow-y: auto; padding-right: 5px; }
         .modal-body::-webkit-scrollbar { width: 5px; }
         .modal-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
 
@@ -271,6 +258,7 @@
         .prompt-ok { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(123,202,245,0.3); }
         .prompt-ok:active { transform: scale(0.95); }
 
+        /* 確保 Loading 畫面預設隱藏，加入 display: none !important */
         .loader-overlay { display: none !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom)); z-index: 2000; justify-content: center; align-items: center; flex-direction: column; overflow: hidden; }
         .loader-overlay.show { display: flex !important; }
         .loader-icon { font-size: 65px; color: var(--text-main); text-align: center; line-height: 65px; animation: naturalSpin 2.5s ease-in-out infinite; position: relative; z-index: 1;}
@@ -285,7 +273,6 @@
 </head>
 <body>
 
-<!-- 雪花特效 (全局背景) -->
 <div class="snowflakes" aria-hidden="true">
     <div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div>
     <div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div>
@@ -517,7 +504,7 @@
 
 </div>
 
-<!-- 底部導航 (順序：查帳 -> 首頁 -> + -> 帳戶 -> 設置) -->
+<!-- 底部導航 -->
 <nav class="bottom-nav">
     <div class="nav-item" id="nav-ledger" onclick="switchPage('ledger')">
         <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg><span>查帳</span>
@@ -526,21 +513,22 @@
         <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>首頁</span>
     </div>
     
+    <div class="nav-item" style="pointer-events:none; opacity:0;"></div> 
     <div class="nav-add" onclick="openModal()">+</div>
     
     <div class="nav-item" id="nav-accounts" onclick="switchPage('accounts')">
         <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg><span>帳戶</span>
     </div>
     <div class="nav-item" id="nav-settings" onclick="switchPage('settings')">
-        <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg><span>設置</span>
+        <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg><span>設置</span>
     </div>
 </nav>
 
 <!-- 新增/編輯交易視窗 -->
 <div class="modal" id="add-modal" onclick="closeModal(event)">
-    <div class="modal-content-wrapper" onclick="event.stopPropagation()">
-        <!-- 獨立出大耳狗 SVG，避免被 overflow: hidden 截斷 -->
-        <svg class="modal-decor" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        
+        <svg class="modal-decor" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" style="top: -65px; width: 190px;">
             <path d="M 50,150 C 30,150 20,130 30,110 C 10,100 10,60 50,50 C 60,30 90,20 120,30 C 140,0 200,0 240,20 C 270,10 320,20 330,50 C 360,50 390,70 380,100 C 390,120 370,150 350,150 Z" fill="#ffffff" stroke="#aaddf9" stroke-width="4" stroke-linejoin="round"/>
             <path d="M 280,40 C 280,20 320,20 320,40 C 320,60 300,70 280,60" fill="none" stroke="#aaddf9" stroke-width="4" stroke-linecap="round"/>
             <path d="M 330,50 C 350,40 370,60 350,80" fill="none" stroke="#aaddf9" stroke-width="4" stroke-linecap="round"/>
@@ -552,76 +540,74 @@
             <path d="M 80,140 C 70,160 110,160 120,140" fill="#ffffff" stroke="#aaddf9" stroke-width="4" stroke-linecap="round"/>
         </svg>
 
-        <div class="modal-content">
-            <div class="modal-body">
-                <h3 id="modal-title" style="text-align: center; margin-bottom: 20px; font-weight: bold; color: var(--text-main); display: none;">編輯交易</h3>
-                
-                <div class="form-group" id="group-single-acc">
-                    <label id="label-single-acc">付款帳戶</label>
-                    <div class="custom-select-wrapper" id="tx-single-acc-wrapper">
-                        <div class="custom-select" onclick="toggleSelect('tx-single-acc-wrapper')">現金</div>
-                        <div class="custom-options">
-                            <div class="custom-option" onclick="selectOption('tx-single-acc-wrapper', 'post', '郵局')">郵局</div>
-                            <div class="custom-option selected" onclick="selectOption('tx-single-acc-wrapper', 'cash', '現金')">現金</div>
-                            <div class="custom-option" onclick="selectOption('tx-single-acc-wrapper', 'jko', '街口')">街口</div>
-                            <div class="custom-option" onclick="selectOption('tx-single-acc-wrapper', 'easycard', '悠游卡')">悠游卡</div>
-                        </div>
-                        <input type="hidden" id="tx-single-acc" value="cash">
+        <div class="modal-body">
+            <h3 id="modal-title" style="text-align: center; margin-bottom: 20px; font-weight: bold; color: var(--text-main); display: none;">編輯交易</h3>
+            
+            <div class="form-group" id="group-single-acc">
+                <label id="label-single-acc">付款帳戶</label>
+                <div class="custom-select-wrapper" id="tx-single-acc-wrapper">
+                    <div class="custom-select" onclick="toggleSelect('tx-single-acc-wrapper')">現金</div>
+                    <div class="custom-options">
+                        <div class="custom-option" onclick="selectOption('tx-single-acc-wrapper', 'post', '郵局')">郵局</div>
+                        <div class="custom-option selected" onclick="selectOption('tx-single-acc-wrapper', 'cash', '現金')">現金</div>
+                        <div class="custom-option" onclick="selectOption('tx-single-acc-wrapper', 'jko', '街口')">街口</div>
+                        <div class="custom-option" onclick="selectOption('tx-single-acc-wrapper', 'easycard', '悠游卡')">悠游卡</div>
                     </div>
+                    <input type="hidden" id="tx-single-acc" value="cash">
                 </div>
+            </div>
 
-                <div class="form-group hidden" id="group-transfer-acc">
-                    <div style="display: flex; gap: 15px;">
-                        <div style="flex:1">
-                            <label>從哪裡扣款？</label>
-                            <div class="custom-select-wrapper" id="tx-from-acc-wrapper">
-                                <div class="custom-select" onclick="toggleSelect('tx-from-acc-wrapper')">郵局</div>
-                                <div class="custom-options">
-                                    <div class="custom-option selected" onclick="selectOption('tx-from-acc-wrapper', 'post', '郵局')">郵局</div>
-                                    <div class="custom-option" onclick="selectOption('tx-from-acc-wrapper', 'cash', '現金')">現金</div>
-                                    <div class="custom-option" onclick="selectOption('tx-from-acc-wrapper', 'jko', '街口')">街口</div>
-                                    <div class="custom-option" onclick="selectOption('tx-from-acc-wrapper', 'easycard', '悠游卡')">悠游卡</div>
-                                </div>
-                                <input type="hidden" id="tx-from-acc" value="post">
+            <div class="form-group hidden" id="group-transfer-acc">
+                <div style="display: flex; gap: 15px;">
+                    <div style="flex:1">
+                        <label>從哪裡扣款？</label>
+                        <div class="custom-select-wrapper" id="tx-from-acc-wrapper">
+                            <div class="custom-select" onclick="toggleSelect('tx-from-acc-wrapper')">郵局</div>
+                            <div class="custom-options">
+                                <div class="custom-option selected" onclick="selectOption('tx-from-acc-wrapper', 'post', '郵局')">郵局</div>
+                                <div class="custom-option" onclick="selectOption('tx-from-acc-wrapper', 'cash', '現金')">現金</div>
+                                <div class="custom-option" onclick="selectOption('tx-from-acc-wrapper', 'jko', '街口')">街口</div>
+                                <div class="custom-option" onclick="selectOption('tx-from-acc-wrapper', 'easycard', '悠游卡')">悠游卡</div>
                             </div>
-                        </div>
-                        <div style="flex:1">
-                            <label>錢轉到哪裡？</label>
-                            <div class="custom-select-wrapper" id="tx-to-acc-wrapper">
-                                <div class="custom-select" onclick="toggleSelect('tx-to-acc-wrapper')">現金</div>
-                                <div class="custom-options">
-                                    <div class="custom-option" onclick="selectOption('tx-to-acc-wrapper', 'post', '郵局')">郵局</div>
-                                    <div class="custom-option selected" onclick="selectOption('tx-to-acc-wrapper', 'cash', '現金')">現金</div>
-                                    <div class="custom-option" onclick="selectOption('tx-to-acc-wrapper', 'jko', '街口')">街口</div>
-                                    <div class="custom-option" onclick="selectOption('tx-to-acc-wrapper', 'easycard', '悠游卡')">悠游卡</div>
-                                </div>
-                                <input type="hidden" id="tx-to-acc" value="cash">
-                            </div>
+                            <input type="hidden" id="tx-from-acc" value="post">
                         </div>
                     </div>
+                    <div style="flex:1">
+                        <label>錢轉到哪裡？</label>
+                        <div class="custom-select-wrapper" id="tx-to-acc-wrapper">
+                            <div class="custom-select" onclick="toggleSelect('tx-to-acc-wrapper')">現金</div>
+                            <div class="custom-options">
+                                <div class="custom-option" onclick="selectOption('tx-to-acc-wrapper', 'post', '郵局')">郵局</div>
+                                <div class="custom-option selected" onclick="selectOption('tx-to-acc-wrapper', 'cash', '現金')">現金</div>
+                                <div class="custom-option" onclick="selectOption('tx-to-acc-wrapper', 'jko', '街口')">街口</div>
+                                <div class="custom-option" onclick="selectOption('tx-to-acc-wrapper', 'easycard', '悠游卡')">悠游卡</div>
+                            </div>
+                            <input type="hidden" id="tx-to-acc" value="cash">
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label>金額</label>
-                    <input type="number" id="tx-amount" placeholder="輸入金額" inputmode="decimal">
-                </div>
-                
-                <div class="form-group">
-                    <label>備註</label>
-                    <input type="text" id="tx-note" placeholder="輸入項目">
-                    <div class="quick-notes" id="quick-notes-list"></div>
-                </div>
+            <div class="form-group">
+                <label>金額</label>
+                <input type="number" id="tx-amount" placeholder="輸入金額" inputmode="decimal">
+            </div>
+            
+            <div class="form-group">
+                <label>備註</label>
+                <input type="text" id="tx-note" placeholder="輸入項目">
+                <div class="quick-notes" id="quick-notes-list"></div>
+            </div>
 
-                <div class="tx-type-group">
-                    <button class="type-btn active" id="tab-expense" onclick="setTxType('expense')">支出</button>
-                    <button class="type-btn" id="tab-transfer" onclick="setTxType('transfer')">轉帳</button>
-                    <button class="type-btn" id="tab-income" onclick="setTxType('income')">收入</button>
-                </div>
-                
-                <div class="action-buttons">
-                    <button class="btn-cancel" onclick="closeModal()">取消</button>
-                    <button class="btn-submit" id="btn-save-tx" onclick="saveTransaction()">記錄</button>
-                </div>
+            <div class="tx-type-group">
+                <button class="type-btn active" id="tab-expense" onclick="setTxType('expense')">支出</button>
+                <button class="type-btn" id="tab-transfer" onclick="setTxType('transfer')">轉帳</button>
+                <button class="type-btn" id="tab-income" onclick="setTxType('income')">收入</button>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn-cancel" onclick="closeModal()">取消</button>
+                <button class="btn-submit" id="btn-save-tx" onclick="saveTransaction()">記錄</button>
             </div>
         </div>
     </div>
@@ -641,30 +627,26 @@
 
 <!-- 修改戶口數額視窗 -->
 <div class="modal" id="balance-modal">
-    <div class="modal-content-wrapper">
-        <div class="modal-content">
-            <h3 style="margin-bottom: 15px; font-weight: bold;">修改帳戶餘額</h3>
-            <p style="font-size: 13px; color: var(--text-light); margin-bottom: 20px;">請輸入各帳戶「目前」的實際餘額，系統會自動產生一筆校正紀錄對齊金額。</p>
-            <div class="form-group"><label>郵局</label><input type="number" id="init-post" inputmode="decimal"></div>
-            <div class="form-group"><label>現金</label><input type="number" id="init-cash" inputmode="decimal"></div>
-            <div class="form-group"><label>街口</label><input type="number" id="init-jko" inputmode="decimal"></div>
-            <div class="form-group"><label>悠游卡</label><input type="number" id="init-easycard" inputmode="decimal"></div>
-            <div class="action-buttons">
-                <button class="btn-submit" onclick="saveInitialBalances()">確認修改</button>
-                <button class="btn-cancel" onclick="closeBalanceModal()">取消</button>
-            </div>
+    <div class="modal-content">
+        <h3 style="margin-bottom: 15px; font-weight: bold;">修改帳戶餘額</h3>
+        <p style="font-size: 13px; color: var(--text-light); margin-bottom: 20px;">請輸入各帳戶「目前」的實際餘額，系統會自動產生一筆校正紀錄對齊金額。</p>
+        <div class="form-group"><label>郵局</label><input type="number" id="init-post" inputmode="decimal"></div>
+        <div class="form-group"><label>現金</label><input type="number" id="init-cash" inputmode="decimal"></div>
+        <div class="form-group"><label>街口</label><input type="number" id="init-jko" inputmode="decimal"></div>
+        <div class="form-group"><label>悠游卡</label><input type="number" id="init-easycard" inputmode="decimal"></div>
+        <div class="action-buttons">
+            <button class="btn-submit" onclick="saveInitialBalances()">確認修改</button>
+            <button class="btn-cancel" onclick="closeBalanceModal()">取消</button>
         </div>
     </div>
 </div>
 
 <!-- 戶口修改記錄視窗 -->
 <div class="modal" id="adjust-history-modal">
-    <div class="modal-content-wrapper">
-        <div class="modal-content">
-            <h3 style="margin-bottom: 20px; font-weight: bold; text-align: center;">戶口修改記錄</h3>
-            <div id="adjust-history-list" style="max-height: 50vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px;"></div>
-            <button class="btn-cancel" style="width: 100%; margin-top: 20px; border-radius: 12px;" onclick="closeAdjustHistoryModal()">關閉記錄</button>
-        </div>
+    <div class="modal-content">
+        <h3 style="margin-bottom: 20px; font-weight: bold; text-align: center;">戶口修改記錄</h3>
+        <div id="adjust-history-list" style="max-height: 50vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px;"></div>
+        <button class="btn-cancel" style="width: 100%; margin-top: 20px; border-radius: 12px;" onclick="closeAdjustHistoryModal()">關閉記錄</button>
     </div>
 </div>
 
