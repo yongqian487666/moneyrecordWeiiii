@@ -51,9 +51,16 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, '微軟正黑體', sans-serif; user-select: none; }
-        
+        /* 隱藏所有捲軸線條，保留滑動功能 */
+         html, body, .modal-body, #adjust-history-list, .custom-options {
+         -ms-overflow-style: none;
+         scrollbar-width: none;
+         }
+         html::-webkit-scrollbar, body::-webkit-scrollbar, .modal-body::-webkit-scrollbar, #adjust-history-list::-webkit-scrollbar, .custom-options::-webkit-scrollbar {
+         display: none;
+         }
         /* 解決 Safari 短頁面拉扯導航欄的問題：使用 overscroll-behavior 完美阻止回彈 */
-        html { 
+         html { 
             background-color: var(--bg-top); 
             overscroll-behavior-y: none; 
         }
@@ -269,8 +276,6 @@
         .modal.show .modal-content { transform: translateY(0); }
         
         .modal-body { max-height: calc(85dvh - 80px); overflow-y: auto; padding-right: 5px; }
-        .modal-body::-webkit-scrollbar { width: 5px; }
-        .modal-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
 
         .modal-decor { position: absolute; top: -65px; left: 50%; transform: translateX(-50%); width: 190px; height: auto; pointer-events: none; z-index: 1001; }
 
@@ -928,30 +933,6 @@
             renderApp();
         });
     }
-
-    const pagesOrder = ['accounts', 'home', 'ledger', 'settings']; 
-    let touchstartX = 0; let touchendX = 0;
-    
-    document.getElementById('swipe-container').addEventListener('touchstart', e => { 
-        if(!e.target.closest('.tx-item')) {
-            touchstartX = e.changedTouches[0].screenX; 
-        }
-    });
-    
-    document.getElementById('swipe-container').addEventListener('touchend', e => {
-        if(!e.target.closest('.tx-item') && touchstartX !== 0) {
-            touchendX = e.changedTouches[0].screenX;
-            const swipeThreshold = 60; 
-            if (touchstartX - touchendX > swipeThreshold) { 
-                const currentIndex = pagesOrder.indexOf(currentPage);
-                if (currentIndex < pagesOrder.length - 1) switchPage(pagesOrder[currentIndex + 1]);
-            } else if (touchendX - touchstartX > swipeThreshold) { 
-                const currentIndex = pagesOrder.indexOf(currentPage);
-                if (currentIndex > 0) switchPage(pagesOrder[currentIndex - 1]);
-            }
-            touchstartX = 0;
-        }
-    });
 
     let itemStartX = 0; let itemStartY = 0;
     function swStart(e) {
