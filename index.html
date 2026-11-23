@@ -108,7 +108,7 @@
         .daily-summary-total.pos { color: var(--accent); }
         .daily-summary-total.zero { color: var(--text-light); }
 
-        .details-controls-card { background: var(--card-bg); border: 1.5px solid var(--card-border); border-radius: 18px; padding: 12px; margin-bottom: 14px; box-shadow: var(--card-shadow); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; flex-direction: column; gap: 10px; }
+        .details-controls-card { position: relative; z-index: 20; background: var(--card-bg); border: 1.5px solid var(--card-border); border-radius: 18px; padding: 12px; margin-bottom: 14px; box-shadow: var(--card-shadow); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; flex-direction: column; gap: 10px; }
         .details-controls-card .time-range-btns { margin-bottom: 0; }
         .detail-filter-btns { display: flex; gap: 6px; }
         .detail-filter-btn { flex: 1; padding: 6px 4px; font-size: 12.5px; font-weight: bold; border-radius: 10px; border: 1.5px solid var(--card-border); background: rgba(255, 255, 255, 0.65); color: var(--text-light); cursor: pointer; transition: 0.2s; }
@@ -442,6 +442,19 @@
                 <button class="detail-filter-btn" id="btn-det-filter-expense" onclick="setDetailsFilter('expense')">支出</button>
                 <button class="detail-filter-btn" id="btn-det-filter-income" onclick="setDetailsFilter('income')">收入</button>
                 <button class="detail-filter-btn" id="btn-det-filter-transfer" onclick="setDetailsFilter('transfer')">轉帳</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 13px; font-weight: bold; color: var(--text-light);">排序方式</span>
+                <div class="custom-select-wrapper inline" id="details-sort-wrapper">
+                    <div class="custom-select inline" onclick="toggleSelect('details-sort-wrapper')">新到舊</div>
+                    <div class="custom-options">
+                        <div class="custom-option selected" onclick="selectOption('details-sort-wrapper', 'date-desc', '新到舊', renderDetailsPage)">新到舊</div>
+                        <div class="custom-option" onclick="selectOption('details-sort-wrapper', 'date-asc', '舊到新', renderDetailsPage)">舊到新</div>
+                        <div class="custom-option" onclick="selectOption('details-sort-wrapper', 'amount-desc', '高到低', renderDetailsPage)">高到低</div>
+                        <div class="custom-option" onclick="selectOption('details-sort-wrapper', 'amount-asc', '低到高', renderDetailsPage)">低到高</div>
+                    </div>
+                    <input type="hidden" id="details-sort" value="date-desc">
+                </div>
             </div>
         </div>
         <div id="details-days-container"></div>
@@ -1083,6 +1096,7 @@
         if (detailsFilterType !== 'all') {
             rangeTx = rangeTx.filter(t => t.type === detailsFilterType);
         }
+        rangeTx = applyFilterAndSort(rangeTx, null, 'details-sort');
 
         let inc = 0, exp = 0, tr = 0;
         rangeTx.forEach(tx => {
