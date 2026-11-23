@@ -4,81 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>純淨記帳</title>
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="純淨記帳">
     <meta name="theme-color" id="theme-color-meta" content="#aaddf9">
-    
     <link rel="apple-touch-icon" href="logo.png">
     <link rel="icon" type="image/png" href="logo.png">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
         :root {
-            --bg-top: #aaddf9;
-            --bg-bottom: #e8f4fa;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --text-main: #333333;
-            --text-light: #777777;
-            --accent: #7bcaf5;
-            --expense: #ff7b89;
-            --transfer: #a0a0a0;
-            --nav-bg: #ffffff;
-            --border-color: #e0e0e0;
-            --calendar-bg: #ffffff;
-            --calendar-header: #f0f8ff;
-            --calendar-text: #333333;
-            --calendar-selected: #7bcaf5;
-            --calendar-today-border: #7bcaf5;
+            --bg-top: #aaddf9; --bg-bottom: #e8f4fa; --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #333333; --text-light: #777777; --accent: #7bcaf5;
+            --expense: #ff7b89; --transfer: #a0a0a0; --nav-bg: #ffffff; --border-color: #e0e0e0;
+            --calendar-bg: #ffffff; --calendar-header: #f0f8ff; --calendar-text: #333333;
+            --calendar-selected: #7bcaf5; --calendar-today-border: #7bcaf5;
+            --calc-num-bg: #f4f7fa; --calc-num-border: #dce4ec;
         }
-
         body.dark-mode {
-            --bg-top: #1a2a3a;
-            --bg-bottom: #121a20;
-            --card-bg: rgba(30, 40, 50, 0.95);
-            --text-main: #f0f0f0;
-            --text-light: #aaaaaa;
-            --accent: #5b9bd5;
-            --nav-bg: #1e2832;
-            --border-color: #444444;
-            --calendar-bg: #1e2832;
-            --calendar-header: #2a3b4c;
-            --calendar-text: #f0f0f0;
-            --calendar-selected: #5b9bd5;
-            --calendar-today-border: #5b9bd5;
+            --bg-top: #1a2a3a; --bg-bottom: #121a20; --card-bg: rgba(30, 40, 50, 0.95);
+            --text-main: #f0f0f0; --text-light: #aaaaaa; --accent: #5b9bd5;
+            --nav-bg: #1e2832; --border-color: #444444;
+            --calendar-bg: #1e2832; --calendar-header: #2a3b4c; --calendar-text: #f0f0f0;
+            --calendar-selected: #5b9bd5; --calendar-today-border: #5b9bd5;
+            --calc-num-bg: #26323e; --calc-num-border: #3d4d5c;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, '微軟正黑體', sans-serif; user-select: none; }
-        /* 隱藏所有捲軸線條，保留滑動功能 */
-         html, body, .modal-body, #adjust-history-list, .custom-options {
-         -ms-overflow-style: none;
-         scrollbar-width: none;
-         }
-         html::-webkit-scrollbar, body::-webkit-scrollbar, .modal-body::-webkit-scrollbar, #adjust-history-list::-webkit-scrollbar, .custom-options::-webkit-scrollbar {
-         display: none;
-         }
-        /* 解決 Safari 短頁面拉扯導航欄的問題：使用 overscroll-behavior 完美阻止回彈 */
-         html { 
-            background-color: var(--bg-top); 
-            overscroll-behavior-y: none; 
-        }
-
-        body { 
-            background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom)); 
-            color: var(--text-main);
-            min-height: 100vh;
-            min-height: 100dvh; 
-            overflow-x: hidden;
-            overscroll-behavior-y: none; /* 阻止 iOS Safari 橡皮筋回彈效果 */
-            transition: background 0.3s ease;
-            margin: 0;
-            padding: 0;
-        }
+        html, body, .modal-body, #adjust-history-list, #cat-detail-list, .custom-options { -ms-overflow-style: none; scrollbar-width: none; }
+        html::-webkit-scrollbar, body::-webkit-scrollbar, .modal-body::-webkit-scrollbar, #adjust-history-list::-webkit-scrollbar, #cat-detail-list::-webkit-scrollbar, .custom-options::-webkit-scrollbar { display: none; }
+        html { background-color: var(--bg-top); overscroll-behavior-y: none; }
+        body { background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom)); color: var(--text-main); min-height: 100vh; min-height: 100dvh; overflow-x: hidden; overscroll-behavior-y: none; transition: background 0.3s ease; }
 
         .snowflakes { position: fixed; top: -10vh; left: 0; width: 100vw; height: 110vh; pointer-events: none; z-index: 0; overflow: hidden; }
-        .snowflake { position: absolute; top: -10vh; color: rgba(255, 255, 255, 0.8); font-family: Arial, sans-serif; cursor: default; animation-name: snowflakes-fall, snowflakes-shake; animation-timing-function: linear, ease-in-out; animation-iteration-count: infinite, infinite; animation-play-state: running, running; }
+        .snowflake { position: absolute; top: -10vh; color: rgba(255, 255, 255, 0.8); font-family: Arial, sans-serif; animation-name: snowflakes-fall, snowflakes-shake; animation-timing-function: linear, ease-in-out; animation-iteration-count: infinite, infinite; }
         body.dark-mode .snowflake { color: rgba(255, 255, 255, 0.15); }
         @keyframes snowflakes-fall { 0% { top: -10vh; } 100% { top: 110vh; } }
         @keyframes snowflakes-shake { 0% { transform: translateX(0px); } 50% { transform: translateX(30px); } 100% { transform: translateX(0px); } }
@@ -93,111 +51,84 @@
         .snowflake:nth-child(9) { left: 85%; animation-duration: 12s, 4s; animation-delay: 2.5s, 1s; font-size: 24px; }
         .snowflake:nth-child(10) { left: 95%; animation-duration: 10s, 3s; animation-delay: 4.5s, 2s; font-size: 18px; }
 
-        .bg-decor { position: fixed; bottom: 160px; right: -20px; opacity: 0.35; pointer-events: none; z-index: 0; width: 220px; }
-
-        /* 恢復原本安全的排版設定，不隨意鎖定高度 */
-        .app-container { 
-            max-width: 480px; 
-            margin: 0 auto; 
-            padding: 20px; 
-            padding-top: calc(20px + env(safe-area-inset-top)); 
-            padding-bottom: calc(100px + env(safe-area-inset-bottom)); 
-            position: relative; 
-            z-index: 1; 
-        }
-
-        .page { 
-            display: none; 
-            animation: fadeIn 0.3s ease-out; 
-            min-height: calc(100dvh - 150px); /* 稍微確保頁面有基本高度，協助對抗回彈 */
-        }
+        .bg-decor { position: fixed; bottom: 90px; right: -10px; opacity: 0.5; pointer-events: none; z-index: 0; width: 250px; }
+        body.dark-mode .bg-decor { opacity: 0.35; }
+        .app-container { max-width: 480px; margin: 0 auto; padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: calc(100px + env(safe-area-inset-bottom)); position: relative; z-index: 1; }
+        .page { display: none; animation: fadeIn 0.3s ease-out; min-height: calc(100dvh - 150px); }
         .page.active { display: block; }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 
         .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 5px 0; }
-        
         .greeting-wrapper { position: relative; display: flex; align-items: center; }
-        .greeting { font-size: 26px; font-weight: 900; color: var(--text-main); letter-spacing: 2px; cursor: pointer; position: relative; } 
-        .speech-bubble {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            margin-top: 12px;
-            background: var(--card-bg);
-            color: var(--text-main);
-            padding: 12px 18px;
-            border-radius: 18px;
-            font-size: 14px;
-            font-weight: bold;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            white-space: nowrap;
-            z-index: 50;
-            pointer-events: none;
-        }
-        .speech-bubble::before {
-            content: '';
-            position: absolute;
-            top: -8px;
-            left: 20px;
-            border-width: 0 8px 8px 8px;
-            border-style: solid;
-            border-color: transparent transparent var(--card-bg) transparent;
-        }
+        .greeting { font-size: 26px; font-weight: 900; color: var(--text-main); letter-spacing: 3px; cursor: pointer; }
+        .speech-bubble { position: absolute; top: 100%; left: 0; margin-top: 12px; background: var(--card-bg); color: var(--text-main); padding: 12px 18px; border-radius: 18px; font-size: 14px; font-weight: bold; box-shadow: 0 8px 25px rgba(0,0,0,0.15); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); white-space: nowrap; z-index: 50; pointer-events: none; }
+        .speech-bubble::before { content: ''; position: absolute; top: -8px; left: 20px; border-width: 0 8px 8px 8px; border-style: solid; border-color: transparent transparent var(--card-bg) transparent; }
         .speech-bubble.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .date-selector { display: flex; align-items: center; gap: 15px; }
+        .date-btn { color: var(--text-main); font-size: 20px; background: none; border: none; font-weight: bold; cursor: pointer; padding: 0 5px; }
+        .date-display { color: var(--text-main); font-size: 18px; font-weight: bold; cursor: pointer; letter-spacing: 1px; }
 
-        .date-selector { display: flex; align-items: center; justify-content: center; gap: 15px; } 
-        .date-btn { color: var(--text-main); font-size: 20px; background: none; border: none; font-weight: bold; cursor: pointer; padding: 0 5px; display: flex; align-items: center; height: 100%;}
-        .date-display { color: var(--text-main); font-size: 18px; font-weight: bold; cursor: pointer; padding: 0; letter-spacing: 1px; display: flex; align-items: center; height: 100%;}
-
-        .dashboard { background: var(--card-bg); border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 15px;}
+        .dashboard { background: var(--card-bg); border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 15px; }
         .dashboard h2 { font-size: 18px; font-weight: bold; color: var(--text-main); margin-bottom: 5px; }
         #total-balance-display { font-size: 38px; font-weight: 900; color: var(--accent); letter-spacing: 0.5px; margin-bottom: 15px; }
-        .chart-container { position: relative; height: 220px; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 10px;}
-        
-        .pie-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; text-align: left; padding: 0 10px;}
+        .chart-container { position: relative; height: 220px; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 10px; }
+        .pie-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; text-align: left; padding: 0 10px; }
         .legend-item { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: bold; color: var(--text-main); }
         .legend-left { display: flex; align-items: center; gap: 8px; }
         .legend-color { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
-
-        .budget-card { background: var(--card-bg); border-radius: 20px; padding: 15px 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        .budget-header { display: flex; justify-content: space-between; font-size: 14px; font-weight: bold; margin-bottom: 10px; color: var(--text-main); }
-        .budget-bar { height: 12px; background: var(--border-color); border-radius: 6px; overflow: hidden; }
-        .budget-progress { height: 100%; border-radius: 6px; transition: width 0.4s ease, background-color 0.4s ease; width: 0%; }
-        .budget-progress.safe { background: #7bcaf5; }
-        .budget-progress.warning { background: #f0ad4e; }
-        .budget-progress.danger { background: #ff7b89; }
 
         .history-header { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
         .history-toggle { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 15px; color: var(--text-main); cursor: pointer; }
         .history-header.open .arrow { transform: rotate(180deg); }
         .arrow { transition: transform 0.3s; color: var(--text-light); font-size: 12px; }
         .history-controls { display: flex; gap: 8px; }
-        
+
+        .daily-summary-card { background: var(--card-bg); border-radius: 14px; padding: 13px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-weight: bold; flex-shrink: 0; }
+        .daily-summary-date { font-size: 14px; color: var(--text-main); }
+        .daily-summary-total { font-size: 16px; font-weight: 900; }
+        .daily-summary-total.neg { color: var(--expense); }
+        .daily-summary-total.pos { color: var(--accent); }
+        .daily-summary-total.zero { color: var(--text-light); }
+
+        /* 明細頁每日分組卡片 */
+        .day-group-block { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+        .day-group-header { background: var(--card-bg); border-radius: 14px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .day-group-date { font-size: 14px; font-weight: bold; color: var(--text-main); }
+        .day-group-nums { display: flex; gap: 10px; font-size: 13px; font-weight: 900; }
+        .day-group-inc { color: var(--accent); }
+        .day-group-exp { color: var(--expense); }
+
         .tx-list { display: flex; flex-direction: column; gap: 12px; overflow: hidden; max-height: 0; transition: max-height 0.4s cubic-bezier(0, 1, 0, 1); margin-top: 10px; }
-        .tx-list.expanded { max-height: 2500px; transition: max-height 0.5s ease-in-out; }
-        
-        .tx-item-wrapper { position: relative; overflow: hidden; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); background-color: var(--card-bg); height: 75px; } 
-        
+        .tx-list.expanded { max-height: 8000px; transition: max-height 0.5s ease-in-out; }
+        .tx-item-wrapper { position: relative; overflow: hidden; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); background-color: var(--card-bg); height: 76px; flex-shrink: 0; }
         .tx-actions { position: absolute; top: 0; bottom: 0; right: 0; display: flex; z-index: 1; }
         .tx-btn { width: 65px; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 14px; cursor: pointer; }
         .tx-btn-edit { background-color: #5b9bd5; }
         .tx-btn-del { background-color: #ff7b89; }
-        
         .tx-item { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; background-color: var(--nav-bg); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .tx-item.swiped { transform: translateX(-130px); } 
-
-        .tx-left { display: flex; flex-direction: column; text-align: left; pointer-events: none; justify-content: center;}
-        .tx-title { font-size: 16px; font-weight: bold; margin-bottom: 4px; line-height: 1.2;}
-        .tx-meta { font-size: 12px; color: var(--text-light); }
-        .tx-right { font-size: 18px; font-weight: bold; text-align: right; pointer-events: none; display: flex; align-items: center;}
+        .tx-item.swiped { transform: translateX(-130px); }
+        .tx-left-group { display: flex; align-items: center; gap: 12px; pointer-events: none; }
+        .tx-cat-icon { width: 38px; height: 38px; border-radius: 12px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; background: rgba(123, 202, 245, 0.14); color: var(--accent); font-size: 19px; }
+        .type-expense .tx-cat-icon { background: rgba(255, 123, 137, 0.14); color: var(--expense); }
+        .type-transfer .tx-cat-icon { background: rgba(160, 160, 160, 0.16); color: var(--transfer); }
+        .tx-cat-icon svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .tx-left { display: flex; flex-direction: column; text-align: left; pointer-events: none; justify-content: center; }
+        .tx-title { font-size: 16px; font-weight: bold; margin-bottom: 4px; line-height: 1.2; color: var(--text-main); }
+        .tx-meta { font-size: 13px; color: var(--text-light); }
+        .tx-right { font-size: 18px; font-weight: bold; text-align: right; pointer-events: none; display: flex; align-items: center; }
         .type-expense .tx-right { color: var(--expense); }
         .type-income .tx-right { color: var(--accent); }
         .type-transfer .tx-right { color: var(--transfer); }
+
+        .cat-summary-card { background: var(--card-bg); border-radius: 16px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.15s ease; flex-shrink: 0; }
+        .cat-summary-card:active { transform: scale(0.98); }
+        .cat-summary-left { display: flex; align-items: center; gap: 12px; }
+        .cat-summary-icon { width: 38px; height: 38px; border-radius: 12px; display: flex; justify-content: center; align-items: center; color: white; flex-shrink: 0; font-size: 18px; }
+        .cat-summary-name { font-size: 15px; font-weight: bold; color: var(--text-main); margin-bottom: 2px; }
+        .cat-summary-pct { font-size: 12.5px; color: var(--text-light); font-weight: bold; }
+        .cat-summary-right { display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 900; color: var(--expense); }
+        .cat-summary-right.income { color: var(--accent); }
+        .cat-summary-arrow { color: var(--text-light); font-size: 13px; }
 
         .ledger-summary { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
         .ledger-summary-item { flex: 1; background: var(--card-bg); border-radius: 16px; padding: 15px 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
@@ -205,31 +136,43 @@
         .ledger-summary-item .amount { font-size: 24px; font-weight: 900; }
         .ledger-summary-item .amount.income { color: var(--accent); }
         .ledger-summary-item .amount.expense { color: var(--expense); }
-        
         .ledger-filter-bar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; padding: 5px 0; border-bottom: 1px solid var(--border-color); }
-        .ledger-filter-row { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 8px;}
+        .ledger-filter-row { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 8px; }
         .ledger-filter-title { font-weight: bold; font-size: 15px; color: var(--text-main); white-space: nowrap; }
-        .search-input { flex: 1; padding: 10px 14px; border: 1.5px solid var(--border-color); border-radius: 12px; background: var(--card-bg); color: var(--text-main); font-size: 14px; outline: none; transition: 0.2s;}
+        .search-input { flex: 1; padding: 10px 14px; border: 1.5px solid var(--border-color); border-radius: 12px; background: var(--card-bg); color: var(--text-main); font-size: 14px; outline: none; transition: 0.2s; }
         .search-input:focus { border-color: var(--accent); }
         .ledger-filter-controls { display: flex; gap: 8px; }
 
         .chart-card { background: var(--card-bg); border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .chart-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;}
-        .chart-card-title { font-size: 16px; font-weight: bold; color: var(--text-main); }
-        .time-range-btns { display: flex; background: var(--border-color); border-radius: 10px; overflow: hidden; }
-        .time-btn { padding: 6px 10px; font-size: 12px; border: none; background: transparent; color: var(--text-light); cursor: pointer; transition: 0.2s; font-weight: bold; }
+        .chart-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
+        .chart-card-title { font-size: 16px; font-weight: bold; color: var(--text-main); white-space: nowrap; }
+        .chart-top-controls { display: flex; align-items: center; gap: 6px; }
+        .flow-toggle-group { display: flex; background: var(--border-color); border-radius: 10px; overflow: hidden; }
+        .flow-btn { padding: 5px 10px; font-size: 12px; font-weight: bold; border: none; background: transparent; color: var(--text-light); cursor: pointer; transition: 0.2s; }
+        .flow-btn.active-expense { background: var(--expense); color: white; }
+        .flow-btn.active-income { background: var(--accent); color: white; }
+        .chart-toggle-btn { display: flex; align-items: center; gap: 4px; background: rgba(123, 202, 245, 0.16); color: var(--accent); border: 1.5px solid var(--accent); border-radius: 10px; padding: 4px 9px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+        .chart-toggle-btn:active { transform: scale(0.95); }
+        .chart-toggle-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .time-range-btns { display: flex; background: var(--border-color); border-radius: 10px; overflow: hidden; margin-bottom: 15px; }
+        .time-btn { flex: 1; padding: 7px 4px; font-size: 12px; border: none; background: transparent; color: var(--text-light); cursor: pointer; transition: 0.2s; font-weight: bold; text-align: center; }
         .time-btn.active { background: var(--accent); color: white; }
-        .line-chart-container { position: relative; height: 200px; width: 100%; }
+        .line-chart-container { position: relative; height: 220px; width: 100%; }
+        .doughnut-center-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; display: none; }
+        .doughnut-center-label.show { display: block; }
+        .doughnut-center-title { font-size: 13px; color: var(--text-light); font-weight: bold; margin-bottom: 3px; }
+        .doughnut-center-val { font-size: 20px; color: var(--text-main); font-weight: 900; }
         .chart-description { margin-top: 15px; font-size: 13px; color: var(--text-light); line-height: 1.5; background: rgba(0,0,0,0.03); padding: 12px; border-radius: 12px; }
         .chart-description strong { color: var(--text-main); font-weight: bold; }
 
-        .accounts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .account-card { background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .account-card-name { font-size: 14px; font-weight: bold; color: var(--text-light); margin-bottom: 8px; }
-        .account-card-value { font-size: 24px; font-weight: 900; color: var(--text-main); }
-        
-        .settings-card { background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .settings-card button { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-size: 14px; cursor: pointer; font-weight: bold; transition: 0.2s;}
+        .accounts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .account-card { background: var(--card-bg); border-radius: 16px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .account-card-name { font-size: 14px; font-weight: bold; color: var(--text-light); margin-bottom: 6px; }
+        .account-card-value { font-size: 22px; font-weight: 900; color: var(--text-main); }
+        .settings-section-title { font-size: 15px; font-weight: bold; color: var(--text-light); margin: 22px 0 10px 4px; }
+        .settings-card { background: var(--card-bg); border-radius: 16px; padding: 18px 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .settings-card button { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-size: 14px; cursor: pointer; font-weight: bold; transition: 0.2s; }
         .settings-card button:active { transform: scale(0.95); }
         .settings-title { font-size: 16px; font-weight: bold; }
 
@@ -238,97 +181,86 @@
         .nav-item.active { color: var(--accent); }
         .nav-item svg { width: 24px; height: 24px; fill: currentColor; margin-bottom: 4px; transition: transform 0.2s; }
         .nav-item:active svg { transform: scale(0.9); }
-        
-        .nav-add { width: 50px; height: 50px; background-color: var(--accent); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; font-weight: normal; box-shadow: 0 4px 12px rgba(123,202,245,0.4); transition: transform 0.1s; cursor: pointer; padding-bottom: 4px; box-sizing: border-box;}
+        .nav-add { width: 50px; height: 50px; background-color: var(--accent); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px; box-shadow: 0 4px 12px rgba(123,202,245,0.4); transition: transform 0.1s; cursor: pointer; padding-bottom: 4px; }
         .nav-add:active { transform: scale(0.95); }
         body.dark-mode .nav-add { box-shadow: 0 4px 12px rgba(0,0,0,0.5); border: none; }
 
-        /* 彈窗遮罩設定：完全延伸至頂端覆蓋狀態列 */
-        .modal, .calendar-modal, .custom-prompt { display: none !important; }
+        .modal, .calendar-modal, .custom-prompt { display: none !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100%; height: 100dvh; background-color: rgba(0, 0, 0, 0.35); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; }
         .modal.show, .calendar-modal.show, .custom-prompt.show { display: flex !important; }
-
-        .modal, .calendar-modal, .custom-prompt { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100vw; 
-            height: 100%;
-            height: 100dvh; 
-            background-color: rgba(0, 0, 0, 0.35); 
-            backdrop-filter: blur(8px); 
-            -webkit-backdrop-filter: blur(8px); 
-            z-index: 1000; 
-        }
-        
         .modal { justify-content: center; align-items: flex-end; }
         .calendar-modal { z-index: 1100; justify-content: center; align-items: center; }
         .custom-prompt { z-index: 1200; justify-content: center; align-items: center; }
-        
-        .modal-content { 
-            position: relative; 
-            background-color: var(--card-bg); 
-            width: 100%; max-width: 480px; 
-            border-radius: 30px 30px 0 0; 
-            padding: 30px 25px calc(25px + env(safe-area-inset-bottom)) 25px; 
-            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            overflow: visible; 
-        }
+        .modal-content { position: relative; background-color: var(--card-bg); width: 100%; max-width: 480px; border-radius: 30px 30px 0 0; padding: 30px 25px calc(25px + env(safe-area-inset-bottom)) 25px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow: visible; }
         .modal.show .modal-content { transform: translateY(0); }
-        
-        .modal-body { max-height: calc(85dvh - 80px); overflow-y: auto; padding-right: 5px; }
-
+        .modal-body { max-height: calc(85dvh - 80px); overflow-y: auto; padding: 0 2px; }
         .modal-decor { position: absolute; top: -65px; left: 50%; transform: translateX(-50%); width: 190px; height: auto; pointer-events: none; z-index: 1001; }
 
-        .form-group { margin-bottom: 15px; position: relative;}
-        .form-group label { display: block; font-size: 13px; margin-bottom: 8px; color: var(--text-light); font-weight: bold;}
-        .form-group input { width: 100%; padding: 14px; border: 1.5px solid var(--border-color); background: transparent; color: var(--text-main); border-radius: 14px; font-size: 16px; outline: none; transition: border-color 0.2s; }
-        .form-group input:focus { border-color: var(--accent); }
-        
-        .quick-notes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .q-note { background: var(--border-color); color: var(--text-main); padding: 8px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background 0.2s;}
-        .q-note:active { background: #d0d0d0; }
-        .q-note-del { color: var(--expense); font-weight: bold; padding-left: 6px; border-left: 1px solid rgba(0,0,0,0.1); }
-        .q-note-add { background: var(--accent); color: white; }
+        .form-group { margin-bottom: 14px; position: relative; }
+        .form-group label { display: block; font-size: 13px; margin-bottom: 8px; color: var(--text-light); font-weight: bold; }
+        .form-group input { width: 100%; padding: 14px; border: 1.5px solid var(--border-color); background: transparent; color: var(--text-main); border-radius: 14px; font-size: 16px; outline: none; transition: border-color 0.2s; -webkit-appearance: none; appearance: none; }
+        .form-group input:focus, .form-group input.calc-focused { border-color: var(--accent); }
 
-        .tx-type-group { display: flex; gap: 10px; margin: 25px 0 10px 0; background: rgba(0,0,0,0.03); padding: 5px; border-radius: 16px; }
-        .type-btn { flex: 1; padding: 12px; background: transparent; border: none; border-radius: 12px; color: var(--text-light); cursor: pointer; transition: 0.3s; font-weight: bold; font-size: 15px;}
+        .modal-date-bar { display: flex; align-items: center; justify-content: space-between; border: 1.5px solid var(--border-color); border-radius: 14px; padding: 8px 12px; }
+        .modal-date-btn { background: none; border: none; color: var(--text-main); font-size: 18px; font-weight: bold; cursor: pointer; padding: 4px 10px; border-radius: 8px; }
+        .modal-date-btn:active { background: rgba(0,0,0,0.06); }
+        .modal-date-display { font-size: 15px; font-weight: bold; color: var(--text-main); cursor: pointer; padding: 4px 10px; letter-spacing: 0.5px; }
+
+        /* 4 帳戶格子 */
+        .acc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 1px; }
+        .acc-grid-item { padding: 11px 4px; border-radius: 12px; border: 1.5px solid var(--border-color); background: transparent; color: var(--text-light); font-size: 13px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.2s ease; white-space: nowrap; }
+        .acc-grid-item.active { border-color: var(--accent); background: rgba(123, 202, 245, 0.16); color: var(--accent); }
+
+        .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 1px; }
+        .category-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+        .cat-item { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px; border-radius: 14px; border: 1.5px solid var(--border-color); background: transparent; color: var(--text-light); cursor: pointer; transition: 0.2s ease; gap: 4px; }
+        .cat-item .cat-emoji { font-size: 20px; line-height: 1.1; }
+        .cat-item span { font-size: 12px; font-weight: bold; white-space: nowrap; }
+        .cat-item.active { border-color: var(--accent); background: rgba(123, 202, 245, 0.16); color: var(--accent); }
+
+        .calc-pad { display: none; grid-template-columns: repeat(5, 1fr); grid-auto-rows: 48px; gap: 8px; margin-top: 12px; padding: 10px; border-radius: 18px; background: rgba(0, 0, 0, 0.04); }
+        body.dark-mode .calc-pad { background: rgba(0, 0, 0, 0.25); }
+        .calc-pad.show { display: grid; }
+        .calc-btn { border-radius: 999px; border: 1.5px solid var(--calc-num-border); background: var(--calc-num-bg); color: var(--text-main); font-size: 18px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: transform 0.1s ease; }
+        .calc-btn:active { transform: scale(0.93); opacity: 0.85; }
+        .calc-btn.op { background: var(--accent); border-color: var(--accent); color: #ffffff; font-size: 19px; }
+        .calc-btn.op-text { background: var(--accent); border-color: var(--accent); color: #ffffff; font-size: 15px; }
+        .calc-btn.ok { grid-column: 5; grid-row: 3 / span 2; background: var(--expense); border-color: var(--expense); color: #ffffff; font-size: 17px; border-radius: 26px; }
+
+        .tx-type-group { display: flex; gap: 10px; margin: 0 0 14px 0; background: rgba(0,0,0,0.03); padding: 5px; border-radius: 16px; }
+        .type-btn { flex: 1; padding: 11px; background: transparent; border: none; border-radius: 12px; color: var(--text-light); cursor: pointer; transition: 0.3s; font-weight: bold; font-size: 15px; }
         .type-btn.active { background: var(--card-bg); color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-
-        .action-buttons { display: flex; gap: 12px; margin-top: 20px; }
-        .btn-submit { flex: 4; padding: 16px; background-color: var(--accent); color: white; border: none; border-radius: 16px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(123,202,245,0.4); transition: transform 0.1s;}
+        .action-buttons { display: flex; gap: 12px; margin-top: 16px; }
+        .btn-submit { flex: 4; padding: 15px; background-color: var(--accent); color: white; border: none; border-radius: 16px; font-size: 15px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(123,202,245,0.4); }
         .btn-submit:active { transform: scale(0.98); }
-        .btn-cancel { flex: 1; padding: 16px; background: var(--border-color); color: var(--text-main); border: none; border-radius: 16px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: background 0.2s;}
-        
+        .btn-cancel { flex: 1; padding: 15px; background: var(--border-color); color: var(--text-main); border: none; border-radius: 16px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+
         .custom-select-wrapper { position: relative; user-select: none; width: 100%; }
         .custom-select-wrapper.inline { width: auto; min-width: 90px; }
-        .custom-select { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border: 1.5px solid var(--border-color); border-radius: 14px; background: var(--card-bg); color: var(--text-main); font-size: 14px; font-weight: bold; cursor: pointer; transition: border-color 0.2s; }
+        .custom-select { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border: 1.5px solid var(--border-color); border-radius: 14px; background: var(--card-bg); color: var(--text-main); font-size: 14px; font-weight: bold; cursor: pointer; }
         .custom-select.inline { padding: 8px 12px; border-radius: 10px; font-size: 13px; font-weight: normal; }
         .custom-select:hover, .custom-select.open { border-color: var(--accent); }
         .custom-select::after { content: '▼'; font-size: 10px; color: var(--text-light); transition: transform 0.3s; }
         .custom-select.open::after { transform: rotate(180deg); }
-        .custom-options { position: absolute; top: calc(100% + 5px); left: 0; right: 0; background: var(--card-bg); border-radius: 14px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); border: 1px solid var(--border-color); overflow: hidden; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 100; max-height: 200px; overflow-y: auto; }
+        .custom-options { position: absolute; top: calc(100% + 5px); left: 0; right: 0; background: var(--card-bg); border-radius: 14px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); border: 1px solid var(--border-color); overflow: hidden; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.2s; z-index: 100; max-height: 200px; overflow-y: auto; }
         .custom-select-wrapper.inline .custom-options { right: auto; min-width: 100%; }
         .custom-select.open + .custom-options { opacity: 1; visibility: visible; transform: translateY(0); }
-        .custom-option { padding: 12px 16px; cursor: pointer; font-size: 14px; color: var(--text-main); transition: background 0.2s; border-bottom: 1px solid rgba(0,0,0,0.03); }
+        .custom-option { padding: 12px 16px; cursor: pointer; font-size: 14px; color: var(--text-main); border-bottom: 1px solid rgba(0,0,0,0.03); }
         .custom-select-wrapper.inline .custom-option { padding: 10px 12px; font-size: 13px; }
         .custom-option:last-child { border-bottom: none; }
         .custom-option:hover { background: rgba(123, 202, 245, 0.1); color: var(--accent); }
         .custom-option.selected { background: var(--accent); color: white; font-weight: bold; }
 
-        .history-record-item { background: var(--bg-bottom); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; text-align: left; }
+        .history-record-item { background: var(--bg-bottom); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; text-align: left; flex-shrink: 0; }
         .history-record-time { font-size: 12px; color: var(--text-light); margin-bottom: 5px; font-weight: bold; }
-        .history-record-detail { font-size: 14px; font-weight: bold; color: var(--text-main); line-height: 1.4; }
+        .history-record-detail { font-size: 14px; font-weight: bold; color: var(--text-main); line-height: 1.5; }
 
-        .prompt-content { background: var(--card-bg); width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transform: scale(0.9); opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .prompt-content { background: var(--card-bg); width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transform: scale(0.9); opacity: 0; transition: all 0.3s; }
         .custom-prompt.show .prompt-content { transform: scale(1); opacity: 1; }
         .prompt-content h3 { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: var(--text-main); }
-        .prompt-content input { width: 100%; padding: 12px; border: 1.5px solid var(--border-color); border-radius: 12px; margin-bottom: 20px; font-size: 15px; background: transparent; color: var(--text-main); outline: none; text-align: center;}
-        .prompt-content input:focus { border-color: var(--accent); }
         .prompt-actions { display: flex; gap: 10px; }
-        .prompt-actions button { flex: 1; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 15px; cursor: pointer; border: none; transition: 0.2s; }
+        .prompt-actions button { flex: 1; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 15px; cursor: pointer; border: none; }
         .prompt-cancel { background: var(--border-color); color: var(--text-main); }
         .prompt-ok { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(123,202,245,0.3); }
-        .prompt-ok:active { transform: scale(0.95); }
 
         .calendar-content { background: var(--calendar-bg); width: 90%; max-width: 320px; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .calendar-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: var(--calendar-header); color: var(--calendar-text); }
@@ -336,23 +268,16 @@
         .calendar-body { padding: 20px; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
         .cal-day-header { font-size: 12px; color: var(--text-light); margin-bottom: 10px; font-weight: bold; }
-        .cal-day { padding: 8px 0; font-size: 14px; border-radius: 50%; cursor: pointer; transition: 0.2s; color: var(--calendar-text); background: transparent; }
-        .cal-day:active { background: rgba(0,0,0,0.05); }
+        .cal-day { padding: 8px 0; font-size: 14px; border-radius: 50%; cursor: pointer; color: var(--calendar-text); }
         .cal-day.empty { cursor: default; }
         .cal-day.selected { background: var(--calendar-selected); color: white; font-weight: bold; }
         .cal-day.today { border: 1.5px solid var(--calendar-today-border); }
-        .calendar-close-btn { width: calc(100% - 40px); margin: 0 20px 20px 20px; padding: 12px; border-radius: 12px; border: none; background: var(--border-color); color: var(--text-main); font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .calendar-close-btn { width: calc(100% - 40px); margin: 0 20px 20px 20px; padding: 12px; border-radius: 12px; border: none; background: var(--border-color); color: var(--text-main); font-weight: bold; cursor: pointer; }
 
-        .loader-overlay { display: none !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom)); z-index: 2000; justify-content: center; align-items: center; flex-direction: column; overflow: hidden; }
+        .loader-overlay { display: none !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom)); z-index: 2000; justify-content: center; align-items: center; }
         .loader-overlay.show { display: flex !important; }
-        
-        .loader-icon { font-size: 110px; color: var(--text-main); text-align: center; line-height: 110px; animation: naturalSpin 2.5s ease-in-out infinite; position: relative; z-index: 1;}
-        @keyframes naturalSpin { 
-            0% { transform: rotate(0deg) scale(0.9); opacity: 0.8; } 
-            50% { transform: rotate(180deg) scale(1.15); opacity: 1; } 
-            100% { transform: rotate(360deg) scale(0.9); opacity: 0.8; } 
-        }
-        
+        .loader-icon { font-size: 110px; color: var(--text-main); line-height: 110px; animation: naturalSpin 2.5s ease-in-out infinite; }
+        @keyframes naturalSpin { 0% { transform: rotate(0deg) scale(0.9); opacity: 0.8; } 50% { transform: rotate(180deg) scale(1.15); opacity: 1; } 100% { transform: rotate(360deg) scale(0.9); opacity: 0.8; } }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -363,97 +288,86 @@
     <div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div>
 </div>
 
-<svg class="bg-decor" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
-    <g transform="translate(150, 150) rotate(-8)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6.5">
-        <path d="M-80,-60 Q-60,-60 -60,-80 Q-60,-60 -40,-60 Q-60,-60 -60,-40 Q-60,-60 -80,-60 Z" stroke="#aaddf9" fill="#ffffff" opacity="0.8"/>
-        <path d="M60,70 Q75,70 75,55 Q75,70 90,70 Q75,70 75,85 Q75,70 60,70 Z" stroke="#aaddf9" fill="#ffffff" opacity="0.8"/>
-        <path d="M-50,110 Q-35,110 -35,95 Q-35,110 -20,110 Q-35,110 -35,125 Q-35,110 -50,110 Z" stroke="#aaddf9" fill="#ffffff" opacity="0.8"/>
-        <ellipse cx="0" cy="-80" rx="35" ry="12" stroke="#aaddf9" transform="rotate(-10 0 -80)"/>
-        <path d="M-50,10 C-80,0 -90,-10 -110,-5 C-125,5 -115,25 -95,30 C-100,45 -80,55 -60,40" stroke="#aaddf9" fill="var(--card-bg)"/>
-        <path d="M-90,15 C-80,15 -80,25 -90,25" stroke="#aaddf9"/>
-        <path d="M50,0 C80,-10 90,-20 110,-15 C125,-5 115,15 95,20 C100,35 80,45 60,30" stroke="#aaddf9" fill="var(--card-bg)"/>
-        <path d="M90,5 C80,5 80,15 90,15" stroke="#aaddf9"/>
-        <path d="M -5,-55 C 15,-20 15,-20 35,-15 C 55,-10 70,-10 50,10 C 35,25 40,30 45,55 C 50,70 25,50 0,60 C -20,65 -30,50 -35,35 C -40,15 -55,0 -30,-15 C -15,-25 -20,-20 -5,-55 Z" stroke="#eed17d" fill="var(--card-bg)"/>
-        <path d="M -16,5 L -10,20" stroke="#d4ab4a" stroke-width="7"/>
-        <path d="M 12,5 L 18,20" stroke="#d4ab4a" stroke-width="7"/>
-        <path d="M -8,28 L 1,36 L 10,28" stroke="#d4ab4a" stroke-width="5.5"/>
+<!-- 依圖 3 繪製的藍粉流光雙星背景（若要 100% 蠟筆原圖質感，可替換為 <img src="bg.png" class="bg-decor">） -->
+<svg class="bg-decor" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2.5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+    </defs>
+    <!-- 淺藍流光緞帶 -->
+    <g fill="none" stroke="#8ce0f5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7" filter="url(#softGlow)">
+        <path d="M168,26 C188,52 150,76 156,96 C164,116 218,80 226,102 C232,120 202,138 220,160" stroke-width="3.2"/>
+        <path d="M190,192 C164,218 148,236 128,248" stroke-width="3"/>
+        <path d="M196,216 C206,240 208,284 212,318" stroke-width="2.6"/>
+        <path d="M108,342 C92,360 72,336 48,354 C34,364 26,380 14,386" stroke-width="3.5"/>
+    </g>
+    <!-- 深藍細線流光主軌跡 -->
+    <g fill="none" stroke="#3e73cf" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M168,54 C198,60 202,94 192,114 C186,126 196,136 202,148 C210,166 202,190 176,204 C156,214 148,236 136,262 C126,282 118,302 98,318" stroke-width="2"/>
+        <path d="M194,104 C202,114 196,126 186,128 M198,118 C206,124 202,134 194,136" stroke-width="2"/>
+        <path d="M174,174 C182,184 194,178 198,162" stroke-width="1.8"/>
+        <path d="M162,210 C186,196 214,192 242,200" stroke-width="1.8"/>
+        <path d="M198,200 C204,212 210,224 216,238" stroke-width="1.6"/>
+        <path d="M142,270 C142,286 154,292 168,294 M142,270 C138,286 126,296 114,302" stroke-width="1.6"/>
+        <path d="M100,336 C82,348 68,354 50,358" stroke-width="1.8"/>
+    </g>
+    <!-- 上方小星星 (帶兩顆圓點眼) -->
+    <g transform="translate(150, 178) rotate(-14)">
+        <path d="M0,-22 C5,-10 10,-9 21,-8 C12,0 12,5 15,17 C5,11 0,11 -10,18 C-11,6 -13,2 -21,-6 C-10,-9 -6,-11 0,-22 Z" fill="#ffffff" fill-opacity="0.7" stroke="#3e73cf" stroke-width="2.6" stroke-linejoin="round"/>
+        <circle cx="-5" cy="-1" r="2.2" fill="#3e73cf"/>
+        <circle cx="5" cy="1" r="2.2" fill="#3e73cf"/>
+    </g>
+    <!-- 下方小星星 (帶兩顆圓點眼) -->
+    <g transform="translate(194, 266) rotate(10)">
+        <path d="M0,-22 C5,-10 10,-9 21,-8 C12,0 12,5 15,17 C5,11 0,11 -10,18 C-11,6 -13,2 -21,-6 C-10,-9 -6,-11 0,-22 Z" fill="#ffffff" fill-opacity="0.7" stroke="#3e73cf" stroke-width="2.6" stroke-linejoin="round"/>
+        <circle cx="-5" cy="-1" r="2.2" fill="#3e73cf"/>
+        <circle cx="5" cy="1" r="2.2" fill="#3e73cf"/>
+    </g>
+    <!-- 左下串連四芒星 -->
+    <g fill="none" stroke="#3e73cf" stroke-width="2" stroke-linejoin="round">
+        <path d="M145,296 Q147,303 153,304 Q146,306 144,313 Q142,306 136,304 Q143,302 145,296 Z"/>
+        <path d="M123,314 Q125,321 132,322 Q125,324 123,331 Q121,324 114,322 Q121,320 123,314 Z"/>
+        <path d="M97,328 Q100,338 112,340 Q100,342 97,352 Q94,342 82,340 Q94,338 97,328 Z"/>
+    </g>
+    <!-- 周圍小亮點與十字星 -->
+    <g fill="none" stroke="#7dd4f2" stroke-width="1.8" stroke-linecap="round">
+        <path d="M210,60 L210,74 M203,67 L217,67"/>
+        <path d="M184,132 L184,148 M176,140 L192,140"/>
+        <path d="M172,286 L172,306 M165,296 L179,296"/>
+        <circle cx="230" cy="166" r="4" stroke="#3e73cf" fill="#8ce0f5"/>
+        <circle cx="116" cy="256" r="4" stroke="#3e73cf" fill="#8ce0f5"/>
+        <circle cx="114" cy="280" r="3" fill="#8ce0f5" stroke="none"/>
+        <circle cx="224" cy="254" r="3" fill="#8ce0f5" stroke="none"/>
     </g>
 </svg>
 
-<div class="loader-overlay" id="loading">
-    <div class="loader-icon">&#10054;</div>
-</div>
+<div class="loader-overlay" id="loading"><div class="loader-icon">&#10054;</div></div>
 
 <div class="app-container" id="swipe-container">
-    
     <header class="top-header">
         <div class="greeting-wrapper">
-            <div class="greeting" id="greeting-text" onclick="showGreetingBubble()">早安</div>
+            <div class="greeting" id="greeting-text" onclick="showGreetingBubble()">⛧☆</div>
             <div class="speech-bubble" id="greeting-bubble">希望瑋薇的錢錢都安全躺著！！</div>
         </div>
         <div class="date-selector">
             <button class="date-btn" onclick="changeDate(-1)">❮</button>
-            <div class="date-display" id="date-display" onclick="openCalendar()">2026/11/18</div>
+            <div class="date-display" id="date-display" onclick="openCalendar('main')">2026/11/23</div>
             <button class="date-btn" onclick="changeDate(1)">❯</button>
         </div>
     </header>
 
-    <!-- 左一：帳戶頁 -->
-    <div class="page" id="page-accounts">
-        <h2 style="text-align: center; margin-bottom: 10px; font-weight: bold; color: var(--text-main);">帳戶總覽</h2>
-        <p style="font-size: 13px; color: var(--text-light); text-align: center; margin-bottom: 20px; line-height: 1.6;">
-            為避免漏記帳導致「錢莫名其妙不見」<br>請定期檢查真實餘額並進行校正。
-        </p>
-        <div class="accounts-grid">
-            <div class="account-card">
-                <div class="account-card-name">郵局</div>
-                <div class="account-card-value" style="color: #7bcaf5;" id="acc-post-val">0</div>
-            </div>
-            <div class="account-card">
-                <div class="account-card-name">現金</div>
-                <div class="account-card-value" style="color: #ffb6c1;" id="acc-cash-val">0</div>
-            </div>
-            <div class="account-card">
-                <div class="account-card-name">街口</div>
-                <div class="account-card-value" style="color: #f1a9a0;" id="acc-jko-val">0</div>
-            </div>
-            <div class="account-card">
-                <div class="account-card-name">悠游卡</div>
-                <div class="account-card-value" style="color: #b8c0ff;" id="acc-easy-val">0</div>
-            </div>
-        </div>
-        <div class="action-buttons" style="margin-top: 25px;">
-            <button class="btn-cancel" onclick="openAdjustHistoryModal()">查看校正記錄</button>
-            <button class="btn-submit" onclick="openBalanceModal()">進行餘額校正</button>
-        </div>
-    </div>
-
-    <!-- 左二：首頁 (預設顯示) -->
+    <!-- 1. 首頁 -->
     <div class="page active" id="page-home">
         <div class="dashboard">
             <h2>淨累積資產 TWD</h2>
             <div id="total-balance-display">0</div>
-            <div class="chart-container">
-                <canvas id="myChart"></canvas>
-            </div>
+            <div class="chart-container"><canvas id="myChart"></canvas></div>
             <div class="pie-legend" id="pie-legend"></div>
         </div>
-
-        <div class="budget-card" id="budget-card">
-            <div class="budget-header">
-                <span>本月預算使用率</span>
-                <span id="budget-text">0 / 0</span>
-            </div>
-            <div class="budget-bar">
-                <div class="budget-progress safe" id="budget-progress"></div>
-            </div>
-        </div>
-
         <div class="history-header open" id="history-header">
-            <div class="history-toggle" id="history-toggle" onclick="toggleHistory()">
-                <span>當日歷史記錄</span>
-                <span class="arrow" id="history-arrow">▼</span>
-            </div>
+            <div class="history-toggle" onclick="toggleHistory()"><span>當日歷史記錄</span><span class="arrow">▼</span></div>
             <div class="history-controls">
                 <div class="custom-select-wrapper inline" id="home-filter-wrapper">
                     <div class="custom-select inline" onclick="toggleSelect('home-filter-wrapper')">全部</div>
@@ -480,54 +394,49 @@
         <section class="tx-list expanded" id="tx-container"></section>
     </div>
 
-    <!-- 左三：查帳頁 -->
+    <!-- 2. 查帳頁 -->
     <div class="page" id="page-ledger">
         <h2 style="text-align: center; margin-bottom: 15px; font-weight: bold; color: var(--text-main);">收支總覽</h2>
-        
         <div class="ledger-summary">
-            <div class="ledger-summary-item">
-                <span class="label" id="ledger-expense-label">本月總支出</span>
-                <span class="amount expense" id="ledger-month-expense">0</span>
-            </div>
-            <div class="ledger-summary-item">
-                <span class="label" id="ledger-income-label">本月總收入</span>
-                <span class="amount income" id="ledger-month-income">0</span>
-            </div>
+            <div class="ledger-summary-item"><span class="label" id="ledger-expense-label">本月總支出</span><span class="amount expense" id="ledger-month-expense">0</span></div>
+            <div class="ledger-summary-item"><span class="label" id="ledger-income-label">本月總收入</span><span class="amount income" id="ledger-month-income">0</span></div>
         </div>
-
         <div class="chart-card">
-            <div class="chart-card-header">
-                <span class="chart-card-title">消費趨勢</span>
-                <div class="time-range-btns">
-                    <button class="time-btn" id="btn-range-7" onclick="setLedgerRange(7)">7天</button>
-                    <button class="time-btn" id="btn-range-15" onclick="setLedgerRange(15)">半月</button>
-                    <button class="time-btn active" id="btn-range-30" onclick="setLedgerRange(30)">本月</button>
-                    <button class="time-btn" id="btn-range-365" onclick="setLedgerRange(365)">本年</button>
+            <div class="chart-card-top">
+                <span class="chart-card-title" id="ledger-chart-title">消費趨勢</span>
+                <div class="chart-top-controls">
+                    <div class="flow-toggle-group">
+                        <button class="flow-btn active-expense" id="btn-flow-expense" onclick="setLedgerFlow('expense')">支出</button>
+                        <button class="flow-btn" id="btn-flow-income" onclick="setLedgerFlow('income')">收入</button>
+                    </div>
+                    <button class="chart-toggle-btn" id="chart-toggle-btn" onclick="toggleLedgerChartType()">
+                        <svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg><span>比例</span>
+                    </button>
                 </div>
+            </div>
+            <div class="time-range-btns">
+                <button class="time-btn" id="btn-range-7" onclick="setLedgerRange(7)">7天</button>
+                <button class="time-btn" id="btn-range-15" onclick="setLedgerRange(15)">半月</button>
+                <button class="time-btn active" id="btn-range-30" onclick="setLedgerRange(30)">本月</button>
+                <button class="time-btn" id="btn-range-365" onclick="setLedgerRange(365)">本年</button>
+                <button class="time-btn" id="btn-range-all" onclick="setLedgerRange('all')">全部</button>
             </div>
             <div class="line-chart-container">
                 <canvas id="lineChart"></canvas>
+                <div class="doughnut-center-label" id="doughnut-center-label">
+                    <div class="doughnut-center-title" id="doughnut-center-title">總支出</div>
+                    <div class="doughnut-center-val" id="doughnut-center-val">$ 0</div>
+                </div>
             </div>
             <div class="chart-description" id="chart-desc"></div>
         </div>
-
         <div class="ledger-filter-bar">
             <div class="ledger-filter-row" style="margin-bottom: 5px;">
-                <span class="ledger-filter-title">交易明細</span>
-                <input type="text" id="ledger-search" class="search-input" placeholder="搜尋備註..." oninput="renderApp()">
+                <span class="ledger-filter-title" id="ledger-detail-title">支出明細</span>
+                <input type="text" id="ledger-search" class="search-input" placeholder="搜尋備註或類別..." oninput="renderApp()">
             </div>
-            <div class="ledger-filter-row" style="justify-content: flex-end;">
+            <div class="ledger-filter-row" id="ledger-filter-controls-row" style="justify-content: flex-end;">
                 <div class="ledger-filter-controls">
-                    <div class="custom-select-wrapper inline" id="ledger-filter-wrapper">
-                        <div class="custom-select inline" onclick="toggleSelect('ledger-filter-wrapper')">全部</div>
-                        <div class="custom-options">
-                            <div class="custom-option selected" onclick="selectOption('ledger-filter-wrapper', 'all', '全部', renderApp)">全部</div>
-                            <div class="custom-option" onclick="selectOption('ledger-filter-wrapper', 'expense', '支出', renderApp)">支出</div>
-                            <div class="custom-option" onclick="selectOption('ledger-filter-wrapper', 'income', '收入', renderApp)">收入</div>
-                            <div class="custom-option" onclick="selectOption('ledger-filter-wrapper', 'transfer', '轉帳', renderApp)">轉帳</div>
-                        </div>
-                        <input type="hidden" id="ledger-filter" value="all">
-                    </div>
                     <div class="custom-select-wrapper inline" id="ledger-sort-wrapper">
                         <div class="custom-select inline" onclick="toggleSelect('ledger-sort-wrapper')">新到舊</div>
                         <div class="custom-options">
@@ -541,61 +450,56 @@
                 </div>
             </div>
         </div>
-
         <section class="tx-list expanded" id="ledger-tx-container"></section>
     </div>
 
-    <!-- 最右：設置頁 -->
+    <!-- 3. 明細頁（每日收支總覽） -->
+    <div class="page" id="page-details">
+        <h2 style="text-align: center; margin-bottom: 15px; font-weight: bold; color: var(--text-main);" id="details-month-title">本月每日明細</h2>
+        <div class="ledger-summary">
+            <div class="ledger-summary-item"><span class="label">當月總支出</span><span class="amount expense" id="details-month-expense">0</span></div>
+            <div class="ledger-summary-item"><span class="label">當月總收入</span><span class="amount income" id="details-month-income">0</span></div>
+        </div>
+        <div id="details-days-container"></div>
+    </div>
+
+    <!-- 4. 設置頁（整合帳戶總覽） -->
     <div class="page" id="page-settings">
-        <h2 style="margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 24px;">系統設置</h2>
-        
-        <div class="settings-card">
-            <span class="settings-title">每月預算設定</span>
-            <button onclick="openBudgetModal()">設定</button>
+        <h2 style="margin-bottom: 16px; text-align: center; font-weight: bold; font-size: 24px;">系統設置</h2>
+        <div class="settings-section-title" style="margin-top: 0;">帳戶總覽</div>
+        <div class="accounts-grid">
+            <div class="account-card"><div class="account-card-name">郵局</div><div class="account-card-value" style="color: #7bcaf5;" id="acc-post-val">0</div></div>
+            <div class="account-card"><div class="account-card-name">現金</div><div class="account-card-value" style="color: #ffb6c1;" id="acc-cash-val">0</div></div>
+            <div class="account-card"><div class="account-card-name">街口</div><div class="account-card-value" style="color: #f1a9a0;" id="acc-jko-val">0</div></div>
+            <div class="account-card"><div class="account-card-name">悠游卡</div><div class="account-card-value" style="color: #b8c0ff;" id="acc-easy-val">0</div></div>
+        </div>
+        <div class="action-buttons" style="margin-top: 0; margin-bottom: 20px;">
+            <button class="btn-cancel" onclick="openAdjustHistoryModal()">查看校正記錄</button>
+            <button class="btn-submit" onclick="openBalanceModal()">進行餘額校正</button>
         </div>
 
+        <div class="settings-section-title">一般設定</div>
         <div class="settings-card">
             <span class="settings-title">資料管理</span>
-            <div style="display:flex; gap:10px;">
-                <button onclick="importData()" style="background:var(--border-color); color:var(--text-main);">匯入</button>
-                <button onclick="exportData()">匯出</button>
-            </div>
+            <div style="display:flex; gap:10px;"><button onclick="importData()" style="background:var(--border-color); color:var(--text-main);">匯入</button><button onclick="exportData()">匯出</button></div>
             <input type="file" id="import-file" accept=".json" style="display:none;" onchange="handleImport(event)">
         </div>
-        <div class="settings-card">
-            <span class="settings-title">深色模式</span>
-            <button onclick="toggleTheme()" id="theme-btn">切換</button>
-        </div>
+        <div class="settings-card"><span class="settings-title">深色模式</span><button onclick="toggleTheme()" id="theme-btn">切換</button></div>
     </div>
-
 </div>
 
-<!-- 底部導航 -->
+<!-- 底部導航：首頁 - 查帳 - (+) - 明細 - 設置 -->
 <nav class="bottom-nav">
-    <div class="nav-item" id="nav-accounts" onclick="switchPage('accounts')">
-        <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg><span>帳戶</span>
-    </div>
-    
-    <div class="nav-item active" id="nav-home" onclick="switchPage('home')">
-        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>首頁</span>
-    </div>
-    
-    <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
-        <div class="nav-add" onclick="openModal()">+</div>
-    </div>
-    
-    <div class="nav-item" id="nav-ledger" onclick="switchPage('ledger')">
-        <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg><span>查帳</span>
-    </div>
-    
-    <div class="nav-item" id="nav-settings" onclick="switchPage('settings')">
-        <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg><span>設置</span>
-    </div>
+    <div class="nav-item active" id="nav-home" onclick="switchPage('home')"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>首頁</span></div>
+    <div class="nav-item" id="nav-ledger" onclick="switchPage('ledger')"><svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg><span>查帳</span></div>
+    <div style="flex: 1; display: flex; justify-content: center; align-items: center;"><div class="nav-add" onclick="openModal()">+</div></div>
+    <div class="nav-item" id="nav-details" onclick="switchPage('details')"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 14H7v-2h10v2zm0-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg><span>明細</span></div>
+    <div class="nav-item" id="nav-settings" onclick="switchPage('settings')"><svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg><span>設置</span></div>
 </nav>
 
 <!-- 新增/編輯交易視窗 -->
 <div class="modal" id="add-modal" onclick="closeModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-content" onclick="handleModalContentClick(event)">
         <svg class="modal-decor" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg" style="top: -65px; width: 190px;">
             <path d="M 50,150 C 30,150 20,130 30,110 C 10,100 10,60 50,50 C 60,30 90,20 120,30 C 140,0 200,0 240,20 C 270,10 320,20 330,50 C 360,50 390,70 380,100 C 390,120 370,150 350,150 Z" fill="#ffffff" stroke="#aaddf9" stroke-width="4" stroke-linejoin="round"/>
             <path d="M 280,40 C 280,20 320,20 320,40 C 320,60 300,70 280,60" fill="none" stroke="#aaddf9" stroke-width="4" stroke-linecap="round"/>
@@ -607,24 +511,26 @@
             <path d="M 175,110 C 180,120 185,120 190,110 C 195,120 200,120 205,110" fill="none" stroke="#c49a6c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M 80,140 C 70,160 110,160 120,140" fill="#ffffff" stroke="#aaddf9" stroke-width="4" stroke-linecap="round"/>
         </svg>
-
         <div class="modal-body">
-            <h3 id="modal-title" style="text-align: center; margin-bottom: 20px; font-weight: bold; color: var(--text-main); display: none;">編輯交易</h3>
-            
-            <div class="form-group" id="group-single-acc">
-                <label id="label-single-acc">付款帳戶</label>
-                <div class="custom-select-wrapper" id="tx-single-acc-wrapper">
-                    <div class="custom-select" onclick="toggleSelect('tx-single-acc-wrapper')">現金</div>
-                    <div class="custom-options">
-                        <div class="custom-option" onclick="selectOption('tx-single-acc-wrapper', 'post', '郵局')">郵局</div>
-                        <div class="custom-option selected" onclick="selectOption('tx-single-acc-wrapper', 'cash', '現金')">現金</div>
-                        <div class="custom-option" onclick="selectOption('tx-single-acc-wrapper', 'jko', '街口')">街口</div>
-                        <div class="custom-option" onclick="selectOption('tx-single-acc-wrapper', 'easycard', '悠游卡')">悠游卡</div>
-                    </div>
-                    <input type="hidden" id="tx-single-acc" value="cash">
+            <h3 id="modal-title" style="text-align: center; margin-bottom: 16px; font-weight: bold; color: var(--text-main); display: none;">編輯交易</h3>
+            <div class="form-group">
+                <label>日期</label>
+                <div class="modal-date-bar">
+                    <button type="button" class="modal-date-btn" onclick="changeTxDate(-1)">❮</button>
+                    <div class="modal-date-display" id="tx-date-display" onclick="openCalendar('tx')">2026/11/23 星期一</div>
+                    <button type="button" class="modal-date-btn" onclick="changeTxDate(1)">❯</button>
                 </div>
             </div>
-
+            <div class="tx-type-group">
+                <button class="type-btn active" id="tab-expense" onclick="setTxType('expense')">支出</button>
+                <button class="type-btn" id="tab-transfer" onclick="setTxType('transfer')">轉帳</button>
+                <button class="type-btn" id="tab-income" onclick="setTxType('income')">收入</button>
+            </div>
+            <div class="form-group" id="group-single-acc">
+                <label id="label-single-acc">付款帳戶</label>
+                <div class="acc-grid" id="tx-single-acc-grid"></div>
+                <input type="hidden" id="tx-single-acc" value="cash">
+            </div>
             <div class="form-group hidden" id="group-transfer-acc">
                 <div style="display: flex; gap: 15px;">
                     <div style="flex:1">
@@ -655,56 +561,58 @@
                     </div>
                 </div>
             </div>
-
-            <div class="form-group">
-                <label>金額</label>
-                <input type="number" id="tx-amount" placeholder="輸入金額" inputmode="decimal">
+            <div class="form-group" id="group-amount">
+                <label>金額 (TWD)</label>
+                <input type="text" id="tx-amount" placeholder="輸入金額" readonly onclick="openCalc()">
+                <div class="calc-pad" id="calc-pad">
+                    <button type="button" class="calc-btn" onclick="calcPress('7')">7</button>
+                    <button type="button" class="calc-btn" onclick="calcPress('8')">8</button>
+                    <button type="button" class="calc-btn" onclick="calcPress('9')">9</button>
+                    <button type="button" class="calc-btn op" onclick="calcPress('÷')">÷</button>
+                    <button type="button" class="calc-btn op-text" onclick="calcClear()">AC</button>
+                    <button type="button" class="calc-btn" onclick="calcPress('4')">4</button>
+                    <button type="button" class="calc-btn" onclick="calcPress('5')">5</button>
+                    <button type="button" class="calc-btn" onclick="calcPress('6')">6</button>
+                    <button type="button" class="calc-btn op" onclick="calcPress('×')">×</button>
+                    <button type="button" class="calc-btn op" onclick="calcBackspace()">←</button>
+                    <button type="button" class="calc-btn" onclick="calcPress('1')">1</button>
+                    <button type="button" class="calc-btn" onclick="calcPress('2')">2</button>
+                    <button type="button" class="calc-btn" onclick="calcPress('3')">3</button>
+                    <button type="button" class="calc-btn op" onclick="calcPress('+')">+</button>
+                    <button type="button" class="calc-btn ok" onclick="calcOk()">OK</button>
+                    <button type="button" class="calc-btn" onclick="calcPress('00')">00</button>
+                    <button type="button" class="calc-btn" onclick="calcPress('0')">0</button>
+                    <button type="button" class="calc-btn" onclick="calcPress('.')">.</button>
+                    <button type="button" class="calc-btn op" onclick="calcPress('-')">-</button>
+                </div>
             </div>
-            
-            <div class="form-group">
-                <label>備註</label>
-                <input type="text" id="tx-note" placeholder="輸入項目">
-                <div class="quick-notes" id="quick-notes-list"></div>
-            </div>
-
-            <div class="tx-type-group">
-                <button class="type-btn active" id="tab-expense" onclick="setTxType('expense')">支出</button>
-                <button class="type-btn" id="tab-transfer" onclick="setTxType('transfer')">轉帳</button>
-                <button class="type-btn" id="tab-income" onclick="setTxType('income')">收入</button>
-            </div>
-            
-            <div class="action-buttons">
-                <button class="btn-cancel" onclick="closeModal()">取消</button>
-                <button class="btn-submit" id="btn-save-tx" onclick="saveTransaction()">記錄</button>
-            </div>
+            <div class="form-group" id="group-category"><label>類別</label><div class="category-grid" id="category-grid"></div></div>
+            <div class="form-group"><label>備註</label><input type="text" id="tx-note" placeholder="輸入項目（選填）" onfocus="closeCalc()"></div>
+            <div class="action-buttons"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-submit" id="btn-save-tx" onclick="saveTransaction()">記錄</button></div>
         </div>
     </div>
 </div>
 
-<!-- 自訂 刪除確認視窗 -->
+<!-- 類別明細視窗 -->
+<div class="modal" id="category-detail-modal" onclick="closeCategoryDetailModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h3 id="cat-detail-title" style="margin-bottom: 12px; font-weight: bold; text-align: center;">類別明細</h3>
+        <div class="daily-summary-card" style="margin-bottom: 14px; background: var(--bg-bottom);">
+            <span class="daily-summary-date" id="cat-detail-range">本月</span>
+            <span class="daily-summary-total neg" id="cat-detail-total">$ 0</span>
+        </div>
+        <div id="cat-detail-list" style="max-height: 55vh; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 10px; padding-bottom: 4px;"></div>
+        <button class="btn-cancel" style="width: 100%; margin-top: 18px; border-radius: 12px;" onclick="closeCategoryDetailModal()">關閉明細</button>
+    </div>
+</div>
+
 <div class="custom-prompt" id="custom-confirm">
     <div class="prompt-content">
         <h3 style="margin-bottom: 20px; color: var(--text-main);">確定要刪除這筆紀錄嗎？</h3>
-        <div class="prompt-actions">
-            <button class="prompt-cancel" onclick="closeConfirmModal()">取消</button>
-            <button class="prompt-ok" onclick="executeDeleteTx()" style="background: var(--expense); box-shadow: 0 4px 10px rgba(255, 123, 137, 0.3);">刪除</button>
-        </div>
+        <div class="prompt-actions"><button class="prompt-cancel" onclick="closeConfirmModal()">取消</button><button class="prompt-ok" onclick="executeDeleteTx()" style="background: var(--expense);">刪除</button></div>
     </div>
 </div>
 
-<!-- 預算設定視窗 -->
-<div class="custom-prompt" id="budget-modal">
-    <div class="prompt-content">
-        <h3>每月預算設定</h3>
-        <input type="number" id="budget-input" placeholder="輸入每月預算金額" inputmode="decimal">
-        <div class="prompt-actions">
-            <button class="prompt-cancel" onclick="closeBudgetModal()">取消</button>
-            <button class="prompt-ok" onclick="saveBudget()">儲存設定</button>
-        </div>
-    </div>
-</div>
-
-<!-- 修改戶口數額視窗 -->
 <div class="modal" id="balance-modal">
     <div class="modal-content">
         <h3 style="margin-bottom: 15px; font-weight: bold;">修改帳戶餘額</h3>
@@ -713,54 +621,29 @@
         <div class="form-group"><label>現金</label><input type="number" id="init-cash" inputmode="decimal"></div>
         <div class="form-group"><label>街口</label><input type="number" id="init-jko" inputmode="decimal"></div>
         <div class="form-group"><label>悠游卡</label><input type="number" id="init-easycard" inputmode="decimal"></div>
-        <div class="action-buttons">
-            <button class="btn-submit" onclick="saveInitialBalances()">確認修改</button>
-            <button class="btn-cancel" onclick="closeBalanceModal()">取消</button>
-        </div>
+        <div class="action-buttons"><button class="btn-submit" onclick="saveInitialBalances()">確認修改</button><button class="btn-cancel" onclick="closeBalanceModal()">取消</button></div>
     </div>
 </div>
 
-<!-- 戶口修改記錄視窗 -->
 <div class="modal" id="adjust-history-modal">
     <div class="modal-content">
         <h3 style="margin-bottom: 20px; font-weight: bold; text-align: center;">戶口修改記錄</h3>
-        <div id="adjust-history-list" style="max-height: 50vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px;"></div>
+        <div id="adjust-history-list" style="max-height: 50vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;"></div>
         <button class="btn-cancel" style="width: 100%; margin-top: 20px; border-radius: 12px;" onclick="closeAdjustHistoryModal()">關閉記錄</button>
     </div>
 </div>
 
-<!-- 自訂日曆視窗 -->
 <div class="calendar-modal" id="calendar-modal">
     <div class="calendar-content">
-        <div class="calendar-header">
-            <button onclick="changeCalMonth(-1)">❮</button>
-            <span id="cal-month-year" style="font-weight: bold; font-size: 16px;"></span>
-            <button onclick="changeCalMonth(1)">❯</button>
-        </div>
+        <div class="calendar-header"><button onclick="changeCalMonth(-1)">❮</button><span id="cal-month-year" style="font-weight: bold; font-size: 16px;"></span><button onclick="changeCalMonth(1)">❯</button></div>
         <div class="calendar-body">
-            <div class="calendar-grid">
-                <div class="cal-day-header">日</div><div class="cal-day-header">一</div><div class="cal-day-header">二</div>
-                <div class="cal-day-header">三</div><div class="cal-day-header">四</div><div class="cal-day-header">五</div><div class="cal-day-header">六</div>
-            </div>
+            <div class="calendar-grid"><div class="cal-day-header">日</div><div class="cal-day-header">一</div><div class="cal-day-header">二</div><div class="cal-day-header">三</div><div class="cal-day-header">四</div><div class="cal-day-header">五</div><div class="cal-day-header">六</div></div>
             <div class="calendar-grid" id="cal-days"></div>
         </div>
         <button class="calendar-close-btn" onclick="closeCalendar()">關閉</button>
     </div>
 </div>
 
-<!-- 自訂 Prompt -->
-<div class="custom-prompt" id="custom-prompt">
-    <div class="prompt-content">
-        <h3>新增常用備註</h3>
-        <input type="text" id="prompt-input" placeholder="例如：早餐">
-        <div class="prompt-actions">
-            <button class="prompt-cancel" onclick="closeCustomPrompt()">取消</button>
-            <button class="prompt-ok" onclick="submitCustomPrompt()">確認新增</button>
-        </div>
-    </div>
-</div>
-
-<!-- 自訂 Alert -->
 <div class="custom-prompt" id="custom-alert">
     <div class="prompt-content">
         <h3 id="alert-msg" style="margin-bottom: 20px;">提示訊息</h3>
@@ -771,932 +654,611 @@
 <script>
     Chart.register(ChartDataLabels);
 
+    const accKeys = ['post', 'cash', 'jko', 'easycard'];
     const accNames = { post: '郵局', cash: '現金', jko: '街口', easycard: '悠游卡' };
-    const accColors = ['#7bcaf5', '#ffb6c1', '#ffe4e1', '#b8c0ff'];
-    let currentType = 'expense';
-    let currentPage = 'home';
-    let myPieChart = null;
-    let myLineChart = null;
-    let isHistoryExpanded = true;
-    let ledgerRangeDays = 30;
-    
-    let editingTxId = null;
-    let targetDeleteId = null; 
-    let bubbleTimer = null;
-    
-    let viewingDate = new Date();
-    let calDate = new Date(); 
-    
-    let db = JSON.parse(localStorage.getItem('pure_money_db')) || { 
-        transactions: [],
-        quickNotes: ['午餐', '晚餐', '飲料', '交通'],
-        monthlyBudget: 0
-    };
-    if(db.monthlyBudget === undefined) db.monthlyBudget = 0;
+    const accColors = ['#7bcaf5', '#ffb6c1', '#f1a9a0', '#b8c0ff'];
+    const weekDays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
 
-    function saveDB() { 
-        localStorage.setItem('pure_money_db', JSON.stringify(db)); 
+    // 專屬支出類別 (9)
+    const expenseCategories = [
+        { name: '吃', emoji: '🍚', color: '#e65c72' },
+        { name: '喝', emoji: '🧋', color: '#eb8f47' },
+        { name: '玩', emoji: '🎠', color: '#f3b749' },
+        { name: 'svt', emoji: '💎', color: '#92a8d1' },
+        { name: '購物', emoji: '🛍️', color: '#e16eb8' },
+        { name: '交通', emoji: '🚗', color: '#5a94f0' },
+        { name: '學習', emoji: '📖', color: '#4794a8' },
+        { name: '繳費', emoji: '💰', color: '#9c78eb' },
+        { name: '生活', emoji: '🛁', color: '#61d095' }
+    ];
+    // 專屬收入類別 (7)
+    const incomeCategories = [
+        { name: '生活費', emoji: '🌱', color: '#61d095' },
+        { name: '工讀費', emoji: '🧰', color: '#5a94f0' },
+        { name: '獎學金', emoji: '📝', color: '#f3b749' },
+        { name: '中獎', emoji: '❤️‍🔥', color: '#e65c72' },
+        { name: '退款', emoji: '👻', color: '#9c78eb' },
+        { name: '報銷', emoji: '🧾', color: '#4794a8' },
+        { name: '其他', emoji: '➕', color: '#a8b0b8' }
+    ];
+
+    let selectedCategory = '吃', currentType = 'expense', currentPage = 'home';
+    let myPieChart = null, myLedgerChart = null;
+    let ledgerChartType = 'line', ledgerFlowType = 'expense', ledgerRangeDays = 30;
+    let isHistoryExpanded = true, editingTxId = null, targetDeleteId = null, bubbleTimer = null;
+    let viewingDate = new Date(), txModalDate = new Date(), calDate = new Date(), calendarTarget = 'main';
+    let db = JSON.parse(localStorage.getItem('pure_money_db')) || { transactions: [] };
+
+    function saveDB() { localStorage.setItem('pure_money_db', JSON.stringify(db)); }
+    function toDateKey(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+    function getCategoryObj(catName, type) {
+        const list = type === 'income' ? incomeCategories : expenseCategories;
+        return list.find(c => c.name === catName) || expenseCategories.find(c => c.name === catName) || incomeCategories.find(c => c.name === catName) || { name: '其他', emoji: '➕', color: '#a8b0b8' };
     }
 
-    function autoBackup() {
-        const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a'); 
-        a.href = URL.createObjectURL(blob);
-        a.download = '記帳備份.json'; // 依照你的要求，把名字改成「記帳備份」
-        document.body.appendChild(a); 
-        a.click(); 
-        document.body.removeChild(a);
+    function renderAccountGrid() {
+        const currentAcc = document.getElementById('tx-single-acc').value || 'cash';
+        const grid = document.getElementById('tx-single-acc-grid');
+        grid.innerHTML = '';
+        accKeys.forEach(key => {
+            const div = document.createElement('div');
+            div.className = 'acc-grid-item' + (currentAcc === key ? ' active' : '');
+            div.innerText = accNames[key];
+            div.onclick = () => { document.getElementById('tx-single-acc').value = key; renderAccountGrid(); closeCalc(); };
+            grid.appendChild(div);
+        });
     }
+
+    function renderCategoryGrid() {
+        const grid = document.getElementById('category-grid');
+        const list = currentType === 'income' ? incomeCategories : expenseCategories;
+        if (!list.some(c => c.name === selectedCategory)) selectedCategory = list[0].name;
+        grid.className = 'category-grid' + (currentType === 'income' ? ' cols-4' : '');
+        grid.innerHTML = '';
+        list.forEach(cat => {
+            const div = document.createElement('div');
+            div.className = 'cat-item' + (selectedCategory === cat.name ? ' active' : '');
+            div.innerHTML = `<div class="cat-emoji">${cat.emoji}</div><span>${cat.name}</span>`;
+            div.onclick = () => { selectedCategory = cat.name; renderCategoryGrid(); closeCalc(); };
+            grid.appendChild(div);
+        });
+    }
+
+    function openCalc() { document.getElementById('calc-pad').classList.add('show'); document.getElementById('tx-amount').classList.add('calc-focused'); }
+    function evaluateCalcExpr(raw) {
+        if (!raw) return '';
+        let expr = String(raw).replace(/×/g, '*').replace(/÷/g, '/').replace(/[^0-9+\-*/.]/g, '').replace(/[+\-*/.]+$/, '');
+        if (!expr) return '';
+        try { const res = Function('"use strict"; return (' + expr + ')')(); if (typeof res === 'number' && isFinite(res)) return String(Math.round(res * 100) / 100); } catch (e) {}
+        return raw;
+    }
+    function closeCalc() {
+        const pad = document.getElementById('calc-pad');
+        if (!pad.classList.contains('show')) return;
+        const input = document.getElementById('tx-amount');
+        if (input.value) input.value = evaluateCalcExpr(input.value);
+        pad.classList.remove('show'); input.classList.remove('calc-focused');
+    }
+    function calcPress(val) {
+        const input = document.getElementById('tx-amount');
+        let cur = input.value || '';
+        if (['+', '-', '×', '÷'].includes(val)) {
+            if (!cur) return;
+            if (['+', '-', '×', '÷'].includes(cur.slice(-1))) cur = cur.slice(0, -1);
+            input.value = cur + val; return;
+        }
+        if (val === '.') {
+            const parts = cur.split(/[+\-×÷]/);
+            if (parts[parts.length - 1].includes('.')) return;
+            if (!parts[parts.length - 1]) cur += '0';
+        }
+        if ((val === '0' || val === '00') && cur === '0') return;
+        input.value = cur + val;
+    }
+    function calcClear() { document.getElementById('tx-amount').value = ''; }
+    function calcBackspace() { const i = document.getElementById('tx-amount'); i.value = i.value.slice(0, -1); }
+    function calcOk() { closeCalc(); }
+    function handleModalContentClick(e) { e.stopPropagation(); if (!e.target.closest('#group-amount')) closeCalc(); }
+
+    function formatTxDate() { document.getElementById('tx-date-display').innerText = `${txModalDate.getFullYear()}/${String(txModalDate.getMonth()+1).padStart(2,'0')}/${String(txModalDate.getDate()).padStart(2,'0')} ${weekDays[txModalDate.getDay()]}`; }
+    function changeTxDate(offset) { txModalDate.setDate(txModalDate.getDate() + offset); formatTxDate(); }
 
     let openModalsCount = 0;
     function updateThemeMeta() {
-        const metaTheme = document.getElementById('theme-color-meta');
-        const isDark = document.body.classList.contains('dark-mode');
-        if (openModalsCount > 0) {
-            metaTheme.setAttribute('content', isDark ? '#111b26' : '#6e8fa2');
-        } else {
-            metaTheme.setAttribute('content', isDark ? '#1a2a3a' : '#aaddf9');
-        }
+        const m = document.getElementById('theme-color-meta'), isDark = document.body.classList.contains('dark-mode');
+        m.setAttribute('content', openModalsCount > 0 ? (isDark ? '#111b26' : '#6e8fa2') : (isDark ? '#1a2a3a' : '#aaddf9'));
     }
-    
-    function trackModal(isOpen) {
-        if (isOpen) {
-            openModalsCount++;
-        } else {
-            openModalsCount = Math.max(0, openModalsCount - 1);
-        }
-        updateThemeMeta();
-    }
+    function trackModal(isOpen) { openModalsCount = isOpen ? openModalsCount + 1 : Math.max(0, openModalsCount - 1); updateThemeMeta(); }
 
     function handleUrlParams() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const action = urlParams.get('action');
-        
-        if (action === 'add') {
-            const amount = parseFloat(urlParams.get('amount'));
-            const note = urlParams.get('note');
-            const type = urlParams.get('type') || 'expense'; 
-            const acc = urlParams.get('acc') || 'cash';
-
-            if (amount && note) {
-                let newTx = { id: Date.now(), timestamp: Date.now(), type: type, amount: amount, note: note, singleAcc: acc };
-                db.transactions.push(newTx);
-                saveDB(); 
-                
-                window.history.replaceState(null, '', window.location.pathname);
-                
-                setTimeout(() => {
-                    showAlert(`✅ 捷徑記帳成功：${note} $${amount}`);
-                    renderApp();
-                }, 500);
+        const p = new URLSearchParams(window.location.search);
+        if (p.get('action') === 'add') {
+            const amount = parseFloat(p.get('amount')), note = p.get('note') || '', type = p.get('type') || 'expense', acc = p.get('acc') || 'cash', cat = p.get('category') || (type === 'income' ? '其他' : '吃');
+            if (amount) {
+                db.transactions.push({ id: Date.now(), timestamp: Date.now(), type, amount, category: type === 'transfer' ? '轉帳' : cat, note, singleAcc: acc });
+                saveDB(); window.history.replaceState(null, '', window.location.pathname);
+                setTimeout(() => { showAlert(`✅ 捷徑記帳成功：${cat} $${amount}`); renderApp(); }, 500);
             }
         }
     }
 
-    function showAlert(msg, callback) {
+    function showAlert(msg, cb) {
         document.getElementById('alert-msg').innerText = msg;
-        document.getElementById('custom-alert').classList.add('show');
-        trackModal(true);
-        document.querySelector('#custom-alert .btn-submit').onclick = () => {
-            closeAlert();
-            if(callback) setTimeout(callback, 300);
-        };
+        document.getElementById('custom-alert').classList.add('show'); trackModal(true);
+        document.querySelector('#custom-alert .btn-submit').onclick = () => { closeAlert(); if (cb) setTimeout(cb, 300); };
     }
-    function closeAlert() { 
-        document.getElementById('custom-alert').classList.remove('show'); 
-        trackModal(false);
-    }
+    function closeAlert() { document.getElementById('custom-alert').classList.remove('show'); trackModal(false); }
 
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.custom-select-wrapper')) {
-            document.querySelectorAll('.custom-select').forEach(el => el.classList.remove('open'));
-        }
-        if (!e.target.closest('.tx-item-wrapper')) {
-            resetAllSwipes();
-        }
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-select-wrapper')) document.querySelectorAll('.custom-select').forEach(el => el.classList.remove('open'));
+        if (!e.target.closest('.tx-item-wrapper')) resetAllSwipes();
     });
 
-    function toggleSelect(wrapperId) {
-        const wrapper = document.getElementById(wrapperId);
-        const select = wrapper.querySelector('.custom-select');
-        const isOpen = select.classList.contains('open');
+    function toggleSelect(id) {
+        const s = document.getElementById(id).querySelector('.custom-select'), isOpen = s.classList.contains('open');
         document.querySelectorAll('.custom-select').forEach(el => el.classList.remove('open'));
-        if (!isOpen) select.classList.add('open');
+        if (!isOpen) s.classList.add('open');
+    }
+    function selectOption(id, val, text, cb) {
+        const w = document.getElementById(id);
+        w.querySelector('.custom-select').innerText = text;
+        w.querySelector('input[type="hidden"]').value = val;
+        w.querySelectorAll('.custom-option').forEach(o => { o.classList.remove('selected'); if (o.innerText === text) o.classList.add('selected'); });
+        w.querySelector('.custom-select').classList.remove('open');
+        if (typeof cb === 'function') cb();
     }
 
-    function selectOption(wrapperId, value, text, callback) {
-        const wrapper = document.getElementById(wrapperId);
-        wrapper.querySelector('.custom-select').innerText = text;
-        wrapper.querySelector('input[type="hidden"]').value = value;
-        wrapper.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
-        event.currentTarget.classList.add('selected');
-        wrapper.querySelector('.custom-select').classList.remove('open');
-        
-        if (callback && typeof callback === 'function') callback();
-    }
-
-    function updateGreeting() {
-        const hour = new Date().getHours();
-        let text = '早安';
-        if (hour >= 12 && hour < 18) text = '午安';
-        else if (hour >= 18) text = '晚安';
-        document.getElementById('greeting-text').innerText = text;
-    }
-    
     function showGreetingBubble() {
-        const bubble = document.getElementById('greeting-bubble');
-        bubble.classList.add('show');
-        if(bubbleTimer) clearTimeout(bubbleTimer);
-        bubbleTimer = setTimeout(() => {
-            bubble.classList.remove('show');
-        }, 3000); 
+        const b = document.getElementById('greeting-bubble'); b.classList.add('show');
+        if (bubbleTimer) clearTimeout(bubbleTimer);
+        bubbleTimer = setTimeout(() => b.classList.remove('show'), 3000);
     }
-
     function showLoadingAndExecute(action) {
-        const loader = document.getElementById('loading');
-        loader.classList.add('show');
-        setTimeout(() => {
-            action();
-            setTimeout(() => loader.classList.remove('show'), 300);
-        }, 550);
+        const l = document.getElementById('loading'); l.classList.add('show');
+        setTimeout(() => { try { action(); } catch (err) { console.error(err); } finally { setTimeout(() => l.classList.remove('show'), 300); } }, 550);
     }
-
     function switchPage(page) {
         if (currentPage === page) return;
         showLoadingAndExecute(() => {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
             document.getElementById('page-' + page).classList.add('active');
             document.getElementById('nav-' + page).classList.add('active');
-            currentPage = page;
-            renderApp();
+            currentPage = page; renderApp();
         });
     }
 
-    let itemStartX = 0; let itemStartY = 0;
-    function swStart(e) {
-        itemStartX = e.touches[0].clientX;
-        itemStartY = e.touches[0].clientY;
-    }
+    let itemStartX = 0, itemStartY = 0;
+    function swStart(e) { itemStartX = e.touches[0].clientX; itemStartY = e.touches[0].clientY; }
     function swMove(e) {}
-    
     function swEnd(e) {
-        let ex = e.changedTouches[0].clientX;
-        let ey = e.changedTouches[0].clientY;
-        let currentItem = e.currentTarget;
-        
-        if (Math.abs(ex - itemStartX) > Math.abs(ey - itemStartY) && itemStartX - ex > 40) {
-            resetAllSwipes(); 
-            currentItem.classList.add('swiped');
-        } else if (ex - itemStartX > 40) {
-            currentItem.classList.remove('swiped');
-        }
+        const ex = e.changedTouches[0].clientX, ey = e.changedTouches[0].clientY, cur = e.currentTarget;
+        if (Math.abs(ex - itemStartX) > Math.abs(ey - itemStartY) && itemStartX - ex > 40) { resetAllSwipes(); cur.classList.add('swiped'); }
+        else if (ex - itemStartX > 40) cur.classList.remove('swiped');
     }
-    function resetAllSwipes() {
-        document.querySelectorAll('.tx-item.swiped').forEach(el => el.classList.remove('swiped'));
-    }
+    function resetAllSwipes() { document.querySelectorAll('.tx-item.swiped').forEach(el => el.classList.remove('swiped')); }
 
     function editTx(id) {
-        resetAllSwipes();
+        resetAllSwipes(); closeCategoryDetailModal();
         const tx = db.transactions.find(t => t.id === id);
-        if(!tx) return;
-        
+        if (!tx) return;
         editingTxId = id;
         document.getElementById('modal-title').style.display = 'block';
         document.getElementById('btn-save-tx').innerText = '儲存修改';
-        
-        document.getElementById('tx-amount').value = tx.amount;
-        document.getElementById('tx-note').value = tx.note;
+        txModalDate = new Date(tx.timestamp); formatTxDate();
+        selectedCategory = tx.category || (tx.type === 'income' ? '生活費' : '吃');
         setTxType(tx.type);
-        
-        if(tx.type === 'transfer') {
-            selectOption('tx-from-acc-wrapper', tx.fromAcc, accNames[tx.fromAcc]);
-            selectOption('tx-to-acc-wrapper', tx.toAcc, accNames[tx.toAcc]);
-        } else {
-            selectOption('tx-single-acc-wrapper', tx.singleAcc, accNames[tx.singleAcc]);
-        }
-        
-        const modal = document.getElementById('add-modal');
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
-        renderQuickNotes();
-        trackModal(true);
+        if (tx.type === 'transfer') { selectOption('tx-from-acc-wrapper', tx.fromAcc, accNames[tx.fromAcc]); selectOption('tx-to-acc-wrapper', tx.toAcc, accNames[tx.toAcc]); }
+        else { document.getElementById('tx-single-acc').value = tx.singleAcc; renderAccountGrid(); }
+        document.getElementById('tx-amount').value = tx.amount;
+        document.getElementById('tx-note').value = tx.note || '';
+        closeCalc();
+        const m = document.getElementById('add-modal'); m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10); trackModal(true);
     }
-    
-    function delTx(id) {
-        targetDeleteId = id;
-        document.getElementById('custom-confirm').classList.add('show');
-        trackModal(true);
-    }
-
-    function closeConfirmModal() {
-        document.getElementById('custom-confirm').classList.remove('show');
-        targetDeleteId = null;
-        resetAllSwipes();
-        trackModal(false);
-    }
-
-    function executeDeleteTx() {
-        if (targetDeleteId !== null) {
-            db.transactions = db.transactions.filter(t => t.id !== targetDeleteId);
-            saveDB();
-            renderApp();
-        }
-        closeConfirmModal();
-    }
-
+    function delTx(id) { targetDeleteId = id; document.getElementById('custom-confirm').classList.add('show'); trackModal(true); }
+    function closeConfirmModal() { document.getElementById('custom-confirm').classList.remove('show'); targetDeleteId = null; resetAllSwipes(); trackModal(false); }
+    function executeDeleteTx() { if (targetDeleteId !== null) { db.transactions = db.transactions.filter(t => t.id !== targetDeleteId); saveDB(); closeCategoryDetailModal(); renderApp(); } closeConfirmModal(); }
     function toggleHistory() {
-        const list = document.getElementById('tx-container');
-        const header = document.querySelector('.history-header');
-        isHistoryExpanded = !isHistoryExpanded;
-        if(isHistoryExpanded) {
-            list.classList.add('expanded');
-            header.classList.add('open');
-        } else {
-            list.classList.remove('expanded');
-            header.classList.remove('open');
-        }
+        const l = document.getElementById('tx-container'), h = document.querySelector('.history-header');
+        isHistoryExpanded = !isHistoryExpanded; l.classList.toggle('expanded', isHistoryExpanded); h.classList.toggle('open', isHistoryExpanded);
     }
 
-    function formatViewingDate() {
-        const y = viewingDate.getFullYear();
-        const m = String(viewingDate.getMonth() + 1).padStart(2, '0');
-        const d = String(viewingDate.getDate()).padStart(2, '0');
-        document.getElementById('date-display').innerText = `${y}/${m}/${d}`;
-    }
-
-    function changeDate(offset) {
-        viewingDate.setDate(viewingDate.getDate() + offset);
-        formatViewingDate();
-        renderApp();
-    }
-
-    function openCalendar() {
-        calDate = new Date(viewingDate);
-        renderCalendar();
-        document.getElementById('calendar-modal').classList.add('show');
-        trackModal(true);
-    }
-    function closeCalendar() { 
-        document.getElementById('calendar-modal').classList.remove('show'); 
-        trackModal(false);
-    }
-    function changeCalMonth(offset) {
-        calDate.setMonth(calDate.getMonth() + offset);
-        renderCalendar();
-    }
-
+    function formatViewingDate() { document.getElementById('date-display').innerText = `${viewingDate.getFullYear()}/${String(viewingDate.getMonth()+1).padStart(2,'0')}/${String(viewingDate.getDate()).padStart(2,'0')}`; }
+    function changeDate(offset) { viewingDate.setDate(viewingDate.getDate() + offset); formatViewingDate(); renderApp(); }
+    function openCalendar(target = 'main') { calendarTarget = target; calDate = new Date(target === 'tx' ? txModalDate : viewingDate); renderCalendar(); document.getElementById('calendar-modal').classList.add('show'); trackModal(true); }
+    function closeCalendar() { document.getElementById('calendar-modal').classList.remove('show'); trackModal(false); }
+    function changeCalMonth(offset) { calDate.setMonth(calDate.getMonth() + offset); renderCalendar(); }
     function renderCalendar() {
-        const y = calDate.getFullYear();
-        const m = calDate.getMonth();
+        const y = calDate.getFullYear(), m = calDate.getMonth(), grid = document.getElementById('cal-days'), today = new Date(), ref = calendarTarget === 'tx' ? txModalDate : viewingDate;
         document.getElementById('cal-month-year').innerText = `${y}年 ${m+1}月`;
-        const firstDay = new Date(y, m, 1).getDay();
-        const daysInMonth = new Date(y, m+1, 0).getDate();
-        const grid = document.getElementById('cal-days');
         grid.innerHTML = '';
-        const today = new Date();
-        
-        for(let i=0; i<firstDay; i++) { grid.innerHTML += `<div class="cal-day empty"></div>`; }
-        for(let i=1; i<=daysInMonth; i++) {
-            const cellDate = new Date(y, m, i);
-            let classes = "cal-day";
-            if(cellDate.toDateString() === today.toDateString()) classes += " today";
-            if(cellDate.toDateString() === viewingDate.toDateString()) classes += " selected";
-            grid.innerHTML += `<div class="${classes}" onclick="selectDate(${y}, ${m}, ${i})">${i}</div>`;
+        for (let i = 0; i < new Date(y, m, 1).getDay(); i++) grid.innerHTML += '<div class="cal-day empty"></div>';
+        for (let i = 1; i <= new Date(y, m+1, 0).getDate(); i++) {
+            const c = new Date(y, m, i);
+            let cls = 'cal-day' + (c.toDateString() === today.toDateString() ? ' today' : '') + (c.toDateString() === ref.toDateString() ? ' selected' : '');
+            grid.innerHTML += `<div class="${cls}" onclick="selectDate(${y},${m},${i})">${i}</div>`;
         }
     }
-    
     function selectDate(y, m, d) {
-        viewingDate = new Date(y, m, d);
-        formatViewingDate();
-        closeCalendar();
-        renderApp();
+        if (calendarTarget === 'tx') { txModalDate = new Date(y, m, d); formatTxDate(); closeCalendar(); }
+        else { viewingDate = new Date(y, m, d); formatViewingDate(); closeCalendar(); renderApp(); }
     }
 
     function updateChart(balObj) {
-        const ctx = document.getElementById('myChart');
-        const isDark = document.body.classList.contains('dark-mode');
+        const ctx = document.getElementById('myChart'), isDark = document.body.classList.contains('dark-mode');
         const dataVals = [balObj.post, balObj.cash, balObj.jko, balObj.easycard];
-        const sum = dataVals.reduce((a, b) => a + b, 0);
-        
+        const sum = dataVals.reduce((a, b) => a + b, 0), allZero = sum === 0, displayData = allZero ? [1,1,1,1] : dataVals;
         document.getElementById('total-balance-display').innerText = sum.toLocaleString();
-
-        const allZero = (sum === 0);
-        const displayData = allZero ? [1, 1, 1, 1] : dataVals;
-        const bWidth = isDark ? 2 : 3;
-        const bColor = isDark ? '#1a2a3a' : '#ffffff';
-
-        if (myPieChart) {
-            myPieChart.data.datasets[0].data = displayData;
-            myPieChart.data.datasets[0].borderWidth = bWidth;
-            myPieChart.data.datasets[0].borderColor = bColor;
-            myPieChart.update();
-        } else {
+        const bWidth = isDark ? 2 : 3, bColor = isDark ? '#1a2a3a' : '#ffffff';
+        if (myPieChart) { myPieChart.data.datasets[0].data = displayData; myPieChart.data.datasets[0].borderWidth = bWidth; myPieChart.data.datasets[0].borderColor = bColor; myPieChart.update(); }
+        else {
             myPieChart = new Chart(ctx, {
-                type: 'pie', 
-                data: {
-                    labels: ['郵局', '現金', '街口', '悠游卡'],
-                    datasets: [{
-                        data: displayData,
-                        backgroundColor: accColors,
-                        borderWidth: bWidth,
-                        borderColor: bColor
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false, 
-                    layout: { padding: 10 }, 
-                    animation: { duration: 800, easing: 'easeOutQuart' },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    if(allZero) return ' 0';
-                                    return ' ' + dataVals[context.dataIndex];
-                                }
-                            }
-                        },
-                        datalabels: { display: false } 
-                    }
-                }
+                type: 'pie', data: { labels: ['郵局','現金','街口','悠游卡'], datasets: [{ data: displayData, backgroundColor: accColors, borderWidth: bWidth, borderColor: bColor }] },
+                options: { responsive: true, maintainAspectRatio: false, layout: { padding: 10 }, plugins: { legend: { display: false }, datalabels: { display: false }, tooltip: { callbacks: { label: c => allZero ? ' 0' : ' ' + dataVals[c.dataIndex] } } } }
             });
         }
-        
-        const legendContainer = document.getElementById('pie-legend');
-        legendContainer.innerHTML = '';
-        const labels = ['郵局', '現金', '街口', '悠游卡'];
-        dataVals.forEach((val, i) => {
-            legendContainer.innerHTML += `
-                <div class="legend-item">
-                    <div class="legend-left">
-                        <span class="legend-color" style="background:${accColors[i]}"></span>
-                        <span>${labels[i]}</span>
-                    </div>
-                    <span style="font-size:16px;">${val.toLocaleString()}</span>
-                </div>
-            `;
-        });
+        const leg = document.getElementById('pie-legend'); leg.innerHTML = '';
+        ['郵局','現金','街口','悠游卡'].forEach((l, i) => { leg.innerHTML += `<div class="legend-item"><div class="legend-left"><span class="legend-color" style="background:${accColors[i]}"></span><span>${l}</span></div><span style="font-size:16px;">${dataVals[i].toLocaleString()}</span></div>`; });
     }
 
-    function setLedgerRange(days) {
-        ledgerRangeDays = days;
-        document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(`btn-range-${days}`).classList.add('active');
-        renderApp();
+    function setLedgerRange(days) { ledgerRangeDays = days; document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active')); document.getElementById(`btn-range-${days}`).classList.add('active'); renderApp(); }
+    function setLedgerFlow(flow) {
+        ledgerFlowType = flow;
+        document.getElementById('btn-flow-expense').className = 'flow-btn' + (flow === 'expense' ? ' active-expense' : '');
+        document.getElementById('btn-flow-income').className = 'flow-btn' + (flow === 'income' ? ' active-income' : '');
+        updateLedgerChartHeader(); renderApp();
     }
-
-    function updateLineChart(txList) {
-        const ctx = document.getElementById('lineChart');
-        const isDark = document.body.classList.contains('dark-mode');
-        
-        let startDate, endDate;
-        let isYearView = ledgerRangeDays === 365;
-        
-        if (isYearView) {
-            startDate = new Date(viewingDate.getFullYear(), 0, 1);
-            endDate = new Date(viewingDate.getFullYear(), 11, 31, 23, 59, 59, 999);
-        } else if (ledgerRangeDays === 30) {
-            startDate = new Date(viewingDate.getFullYear(), viewingDate.getMonth(), 1);
-            endDate = new Date(viewingDate.getFullYear(), viewingDate.getMonth() + 1, 0, 23, 59, 59, 999);
+    function toggleLedgerChartType() { ledgerChartType = ledgerChartType === 'line' ? 'pie' : 'line'; updateLedgerChartHeader(); renderApp(); }
+    function updateLedgerChartHeader() {
+        const title = document.getElementById('ledger-chart-title'), btn = document.getElementById('chart-toggle-btn');
+        if (ledgerChartType === 'pie') {
+            title.innerText = (ledgerFlowType === 'income' ? '收入' : '支出') + '比例';
+            btn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><span>趨勢</span>';
         } else {
-            endDate = new Date(viewingDate);
-            endDate.setHours(23, 59, 59, 999);
-            startDate = new Date(viewingDate);
-            startDate.setDate(endDate.getDate() - ledgerRangeDays + 1);
-            startDate.setHours(0,0,0,0);
+            title.innerText = (ledgerFlowType === 'income' ? '收入' : '消費') + '趨勢';
+            btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg><span>比例</span>';
+        }
+    }
+
+    function getLedgerRangeInfo() {
+        const y = viewingDate.getFullYear(), m = viewingDate.getMonth();
+        let startDate, endDate, labelPrefix, rangeTitle;
+        if (ledgerRangeDays === 'all') {
+            const valid = db.transactions.filter(t => t.type !== 'adjust');
+            startDate = new Date(valid.length ? Math.min(...valid.map(t => t.timestamp)) : viewingDate); startDate.setHours(0,0,0,0);
+            endDate = new Date(valid.length ? Math.max(...valid.map(t => t.timestamp)) : viewingDate); endDate.setHours(23,59,59,999);
+            labelPrefix = '全部'; rangeTitle = '全部記錄';
+        } else if (ledgerRangeDays === 365) {
+            startDate = new Date(y, 0, 1, 0,0,0,0); endDate = new Date(y, 11, 31, 23,59,59,999); labelPrefix = '本年'; rangeTitle = `${y}年`;
+        } else if (ledgerRangeDays === 30) {
+            startDate = new Date(y, m, 1, 0,0,0,0); endDate = new Date(y, m+1, 0, 23,59,59,999); labelPrefix = '本月'; rangeTitle = `${y}/${String(m+1).padStart(2,'0')} 本月`;
+        } else {
+            endDate = new Date(viewingDate); endDate.setHours(23,59,59,999);
+            startDate = new Date(viewingDate); startDate.setDate(endDate.getDate() - ledgerRangeDays + 1); startDate.setHours(0,0,0,0);
+            labelPrefix = `近${ledgerRangeDays}天`;
+            rangeTitle = `${String(startDate.getMonth()+1).padStart(2,'0')}/${String(startDate.getDate()).padStart(2,'0')} - ${String(endDate.getMonth()+1).padStart(2,'0')}/${String(endDate.getDate()).padStart(2,'0')}`;
+        }
+        return { startDate, endDate, startMs: startDate.getTime(), endMs: endDate.getTime(), labelPrefix, rangeTitle };
+    }
+
+    function updateLedgerChart(flowTx, rangeInfo) {
+        const ctx = document.getElementById('lineChart'), isDark = document.body.classList.contains('dark-mode');
+        const centerLabel = document.getElementById('doughnut-center-label'), centerTitle = document.getElementById('doughnut-center-title'), centerVal = document.getElementById('doughnut-center-val');
+        const isInc = ledgerFlowType === 'income', flowLabel = isInc ? '收入' : '支出';
+        if (myLedgerChart) { myLedgerChart.destroy(); myLedgerChart = null; }
+
+        if (ledgerChartType === 'pie') {
+            const catMap = {}; let total = 0;
+            flowTx.forEach(tx => { const c = tx.category || (isInc ? '其他' : '吃'); catMap[c] = (catMap[c] || 0) + tx.amount; total += tx.amount; });
+            const sortedCats = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
+            const labels = sortedCats.length ? sortedCats.map(c => c[0]) : [`無${flowLabel}`];
+            const dataVals = sortedCats.length ? sortedCats.map(c => c[1]) : [1];
+            const bgColors = sortedCats.length ? sortedCats.map(c => getCategoryObj(c[0], ledgerFlowType).color) : [isDark ? '#334150' : '#e5edf3'];
+            centerLabel.classList.add('show'); centerTitle.innerText = `總${flowLabel}`; centerVal.innerText = `$ ${total.toLocaleString()}`;
+            myLedgerChart = new Chart(ctx, {
+                type: 'doughnut', data: { labels, datasets: [{ data: dataVals, backgroundColor: bgColors, borderWidth: 2, borderColor: isDark ? '#1e2832' : '#ffffff' }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '64%', plugins: { legend: { display: false }, datalabels: { display: false }, tooltip: { callbacks: { label: c => !sortedCats.length ? ' 0' : ` ${labels[c.dataIndex]}: $${dataVals[c.dataIndex].toLocaleString()} (${((dataVals[c.dataIndex]/total)*100).toFixed(1)}%)` } } } }
+            });
+            document.getElementById('chart-desc').innerHTML = sortedCats.length
+                ? `${rangeInfo.labelPrefix}共${flowLabel} <strong>${total.toLocaleString()}</strong> 元，最大${flowLabel}類別為 <strong>${sortedCats[0][0]}</strong>（${((sortedCats[0][1]/total)*100).toFixed(1)}%）。點擊下方類別可查看明細。`
+                : `${rangeInfo.labelPrefix}尚無${flowLabel}記錄。`;
+            return { sortedCats, total };
         }
 
-        const dateLabels = [];
-        const expenseData = [];
-        let totalExp = 0;
-        
-        if (isYearView) {
-            for (let i = 1; i <= 12; i++) {
-                dateLabels.push(`${i}月`);
-                expenseData.push(0);
-            }
-            txList.forEach(tx => {
-                if (tx.type === 'expense' && tx.timestamp >= startDate.getTime() && tx.timestamp <= endDate.getTime()) {
-                    const txDate = new Date(tx.timestamp);
-                    const monthIdx = txDate.getMonth(); 
-                    expenseData[monthIdx] += tx.amount;
-                    totalExp += tx.amount;
-                }
-            });
+        centerLabel.classList.remove('show');
+        const { startDate, endDate } = rangeInfo, dateLabels = [], seriesData = []; let total = 0;
+        const daySpan = Math.max(1, Math.round((endDate - startDate) / 86400000) + 1);
+        const groupByMonth = (ledgerRangeDays === 365) || (ledgerRangeDays === 'all' && daySpan > 90);
+        if (ledgerRangeDays === 365) {
+            for (let i = 1; i <= 12; i++) { dateLabels.push(`${i}月`); seriesData.push(0); }
+            flowTx.forEach(tx => { seriesData[new Date(tx.timestamp).getMonth()] += tx.amount; total += tx.amount; });
+        } else if (groupByMonth) {
+            let curr = new Date(startDate.getFullYear(), startDate.getMonth(), 1), endM = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+            while (curr <= endM) { dateLabels.push(`${curr.getFullYear()}/${String(curr.getMonth()+1).padStart(2,'0')}`); seriesData.push(0); curr.setMonth(curr.getMonth()+1); }
+            flowTx.forEach(tx => { const d = new Date(tx.timestamp), idx = dateLabels.indexOf(`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}`); if (idx !== -1) { seriesData[idx] += tx.amount; total += tx.amount; } });
         } else {
             let curr = new Date(startDate);
-            while (curr <= endDate) {
-                const m = String(curr.getMonth() + 1).padStart(2, '0');
-                const d = String(curr.getDate()).padStart(2, '0');
-                dateLabels.push(`${m}/${d}`);
-                expenseData.push(0);
-                curr.setDate(curr.getDate() + 1);
-            }
-            txList.forEach(tx => {
-                if (tx.type === 'expense' && tx.timestamp >= startDate.getTime() && tx.timestamp <= endDate.getTime()) {
-                    const txDate = new Date(tx.timestamp);
-                    const m = String(txDate.getMonth() + 1).padStart(2, '0');
-                    const d = String(txDate.getDate()).padStart(2, '0');
-                    const label = `${m}/${d}`;
-                    const idx = dateLabels.indexOf(label);
-                    if (idx !== -1) {
-                        expenseData[idx] += tx.amount;
-                        totalExp += tx.amount;
-                    }
-                }
-            });
+            while (curr <= endDate) { dateLabels.push(`${String(curr.getMonth()+1).padStart(2,'0')}/${String(curr.getDate()).padStart(2,'0')}`); seriesData.push(0); curr.setDate(curr.getDate()+1); }
+            flowTx.forEach(tx => { const d = new Date(tx.timestamp), idx = dateLabels.indexOf(`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`); if (idx !== -1) { seriesData[idx] += tx.amount; total += tx.amount; } });
         }
+        const avgText = ledgerRangeDays === 365 ? `平均每月${flowLabel}約 <strong>${Math.round(total/12).toLocaleString()}</strong> 元` : `平均每日${flowLabel}約 <strong>${Math.round(total/daySpan).toLocaleString()}</strong> 元`;
+        document.getElementById('chart-desc').innerHTML = `${rangeInfo.labelPrefix}的總${flowLabel}為 <strong>${total.toLocaleString()}</strong> 元，${avgText}。`;
 
-        let rangeText = "";
-        let avgText = "";
-        if (isYearView) {
-            rangeText = "今年";
-            const avg = Math.round(totalExp / 12);
-            avgText = `平均每月消費約 <strong>${avg.toLocaleString()}</strong> 元`;
-        } else {
-            const avg = Math.round(totalExp / ledgerRangeDays);
-            rangeText = ledgerRangeDays === 30 ? "這個月" : (ledgerRangeDays === 15 ? "這半個月" : `這 ${ledgerRangeDays} 天`);
-            avgText = `平均每日消費約 <strong>${avg.toLocaleString()}</strong> 元`;
-        }
-        document.getElementById('chart-desc').innerHTML = `${rangeText}的總支出為 <strong>${totalExp.toLocaleString()}</strong> 元，${avgText}。`;
-
-        if (myLineChart) {
-            myLineChart.data.labels = dateLabels;
-            myLineChart.data.datasets[0].data = expenseData;
-            myLineChart.options.scales.x.ticks.color = isDark ? '#aaaaaa' : '#777777';
-            myLineChart.options.scales.y.ticks.color = isDark ? '#aaaaaa' : '#777777';
-            myLineChart.options.scales.x.grid.color = isDark ? '#333333' : '#eeeeee';
-            myLineChart.options.scales.y.grid.color = isDark ? '#333333' : '#eeeeee';
-            myLineChart.update();
-        } else {
-            myLineChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dateLabels,
-                    datasets: [{
-                        label: '支出金額',
-                        data: expenseData,
-                        borderColor: '#ff7b89',
-                        backgroundColor: 'rgba(255, 123, 137, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4, 
-                        pointRadius: 2,
-                        pointBackgroundColor: '#ff7b89'
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false },
-                        datalabels: { display: false } 
-                    },
-                    scales: {
-                        x: { 
-                            grid: { color: isDark ? '#333333' : '#eeeeee', drawBorder: false },
-                            ticks: { color: isDark ? '#aaaaaa' : '#777777', maxTicksLimit: 7 } 
-                        },
-                        y: { 
-                            beginAtZero: true,
-                            grid: { color: isDark ? '#333333' : '#eeeeee', drawBorder: false },
-                            ticks: { color: isDark ? '#aaaaaa' : '#777777', maxTicksLimit: 5 }
-                        }
-                    }
-                }
-            });
-        }
-    }
-
-    function updateBudgetBar() {
-        const bdg = db.monthlyBudget || 0;
-        const bar = document.getElementById('budget-progress');
-        const txt = document.getElementById('budget-text');
-        
-        if (bdg === 0) {
-            txt.innerText = `尚未設定預算`;
-            bar.style.width = '0%';
-            return;
-        }
-
-        const y = viewingDate.getFullYear();
-        const m = viewingDate.getMonth();
-        const start = new Date(y, m, 1).getTime();
-        const end = new Date(y, m + 1, 0, 23, 59, 59, 999).getTime();
-        
-        let monthExpense = 0;
-        db.transactions.forEach(tx => {
-            if (tx.type === 'expense' && tx.timestamp >= start && tx.timestamp <= end) monthExpense += tx.amount;
+        const lineColor = isInc ? '#7bcaf5' : '#ff7b89', fillColor = isInc ? 'rgba(123, 202, 245, 0.14)' : 'rgba(255, 123, 137, 0.12)';
+        myLedgerChart = new Chart(ctx, {
+            type: 'line', data: { labels: dateLabels, datasets: [{ label: `${flowLabel}金額`, data: seriesData, borderColor: lineColor, backgroundColor: fillColor, borderWidth: 2, fill: true, tension: 0.4, pointRadius: 2, pointBackgroundColor: lineColor }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { display: false } }, scales: { x: { grid: { color: isDark ? '#333' : '#eee', drawBorder: false }, ticks: { color: isDark ? '#aaa' : '#777', maxTicksLimit: 7 } }, y: { beginAtZero: true, grid: { color: isDark ? '#333' : '#eee', drawBorder: false }, ticks: { color: isDark ? '#aaa' : '#777', maxTicksLimit: 5 } } } }
         });
-
-        txt.innerText = `${monthExpense.toLocaleString()} / ${bdg.toLocaleString()}`;
-        
-        let pct = (monthExpense / bdg) * 100;
-        if (pct > 100) pct = 100;
-        bar.style.width = `${pct}%`;
-        
-        bar.className = 'budget-progress';
-        if (pct <= 60) bar.classList.add('safe');
-        else if (pct <= 90) bar.classList.add('warning');
-        else bar.classList.add('danger');
-    }
-    
-    function openBudgetModal() {
-        document.getElementById('budget-input').value = db.monthlyBudget || '';
-        document.getElementById('budget-modal').classList.add('show');
-        trackModal(true);
-    }
-    function closeBudgetModal() { 
-        document.getElementById('budget-modal').classList.remove('show'); 
-        trackModal(false);
-    }
-    
-    function saveBudget() {
-        const val = parseFloat(document.getElementById('budget-input').value);
-        if(!isNaN(val) && val >= 0) {
-            db.monthlyBudget = val;
-            saveDB();
-            closeBudgetModal();
-            switchPage('home'); 
-        } else {
-            showAlert('請輸入正確的金額喔！');
-        }
+        return null;
     }
 
-    function renderQuickNotes() {
-        const container = document.getElementById('quick-notes-list');
-        container.innerHTML = '';
-        db.quickNotes.forEach((note, index) => {
-            const div = document.createElement('div');
-            div.className = 'q-note';
-            div.innerHTML = `<span onclick="applyNote('${note}')">${note}</span><span class="q-note-del" onclick="deleteQuickNote(${index})">×</span>`;
-            container.appendChild(div);
-        });
-        const addDiv = document.createElement('div');
-        addDiv.className = 'q-note q-note-add';
-        addDiv.innerText = '+ 新增';
-        addDiv.onclick = openCustomPrompt;
-        container.appendChild(addDiv);
+    function openCategoryDetailModal(catName) {
+        const rangeInfo = getLedgerRangeInfo(), isInc = ledgerFlowType === 'income', flowLabel = isInc ? '收入' : '支出';
+        const catTxs = db.transactions.filter(tx => tx.type === ledgerFlowType && (tx.category || '其他') === catName && tx.timestamp >= rangeInfo.startMs && tx.timestamp <= rangeInfo.endMs).sort((a, b) => b.timestamp - a.timestamp);
+        const total = catTxs.reduce((s, t) => s + t.amount, 0);
+        document.getElementById('cat-detail-title').innerText = `${catName} ${flowLabel}明細`;
+        document.getElementById('cat-detail-range').innerText = rangeInfo.rangeTitle;
+        const totEl = document.getElementById('cat-detail-total');
+        totEl.className = 'daily-summary-total ' + (isInc ? 'pos' : 'neg');
+        totEl.innerText = `$ ${isInc ? '+' : '-'}${total.toLocaleString()}`;
+        const list = document.getElementById('cat-detail-list');
+        list.innerHTML = catTxs.length === 0 ? '<div style="text-align:center; padding: 20px; color: var(--text-light); font-size: 14px;">查無記錄</div>' : '';
+        catTxs.forEach(tx => list.insertAdjacentHTML('beforeend', generateTxHTML(tx)));
+        const m = document.getElementById('category-detail-modal'); m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10); trackModal(true);
     }
-
-    function applyNote(note) { document.getElementById('tx-note').value = note; }
-    function deleteQuickNote(index) { db.quickNotes.splice(index, 1); saveDB(); renderQuickNotes(); }
-    
-    function openCustomPrompt() {
-        document.getElementById('prompt-input').value = '';
-        document.getElementById('custom-prompt').classList.add('show');
-        document.getElementById('prompt-input').focus();
-        trackModal(true);
-    }
-    function closeCustomPrompt() { 
-        document.getElementById('custom-prompt').classList.remove('show'); 
-        trackModal(false);
-    }
-    function submitCustomPrompt() {
-        const n = document.getElementById('prompt-input').value;
-        if(n && n.trim() !== '') { db.quickNotes.push(n.trim()); saveDB(); renderQuickNotes(); }
-        closeCustomPrompt();
+    function closeCategoryDetailModal() {
+        const m = document.getElementById('category-detail-modal');
+        if (!m.classList.contains('show')) return;
+        m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 300); trackModal(false);
     }
 
     function calculateCurrentBalances(cutoffMs) {
         let bal = { post: 0, cash: 0, jko: 0, easycard: 0 };
         let filteredTx = db.transactions.filter(tx => tx.timestamp <= cutoffMs);
         filteredTx.sort((a, b) => a.timestamp - b.timestamp).forEach(tx => {
-            if (tx.type === 'adjust') { bal[tx.singleAcc] = tx.amount; } 
-            else {
-                if (tx.type === 'expense') bal[tx.singleAcc] -= tx.amount;
-                if (tx.type === 'income') bal[tx.singleAcc] += tx.amount;
-                if (tx.type === 'transfer') { bal[tx.fromAcc] -= tx.amount; bal[tx.toAcc] += tx.amount; }
-            }
+            if (tx.type === 'adjust') {
+                if (tx.prevAmount != null) bal[tx.singleAcc] += (tx.amount - tx.prevAmount);
+                else bal[tx.singleAcc] = tx.amount;
+            } else if (tx.type === 'expense') bal[tx.singleAcc] -= tx.amount;
+            else if (tx.type === 'income') bal[tx.singleAcc] += tx.amount;
+            else if (tx.type === 'transfer') { bal[tx.fromAcc] -= tx.amount; bal[tx.toAcc] += tx.amount; }
         });
         return { bal, filteredTx };
     }
 
+    // 主標題為「日期 | 類別」（大字），下面才是備註與帳戶
     function generateTxHTML(tx) {
-        let amountText = ''; let metaText = '';
-        if (tx.type === 'expense') { amountText = `- ${tx.amount}`; metaText = `從 ${accNames[tx.singleAcc]} 扣款`; } 
-        else if (tx.type === 'income') { amountText = `+ ${tx.amount}`; metaText = `存入 ${accNames[tx.singleAcc]}`; } 
-        else if (tx.type === 'transfer') { amountText = `${tx.amount}`; metaText = `${accNames[tx.fromAcc]} -> ${accNames[tx.toAcc]}`; }
+        let amountText = '', accText = '';
+        if (tx.type === 'expense') { amountText = `- ${tx.amount}`; accText = `從 ${accNames[tx.singleAcc]} 扣款`; }
+        else if (tx.type === 'income') { amountText = `+ ${tx.amount}`; accText = `存入 ${accNames[tx.singleAcc]}`; }
+        else if (tx.type === 'transfer') { amountText = `${tx.amount}`; accText = `${accNames[tx.fromAcc]} -> ${accNames[tx.toAcc]}`; }
         const d = new Date(tx.timestamp);
-        const dateStr = `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-        
-        return `
-            <div class="tx-item-wrapper" id="tx-wrapper-${tx.id}">
-                <div class="tx-actions">
-                    <div class="tx-btn tx-btn-edit" onclick="editTx(${tx.id})">編輯</div>
-                    <div class="tx-btn tx-btn-del" onclick="delTx(${tx.id})">刪除</div>
-                </div>
-                <div class="tx-item type-${tx.type}" id="tx-item-${tx.id}" ontouchstart="swStart(event)" ontouchmove="swMove(event)" ontouchend="swEnd(event)">
-                    <div class="tx-left">
-                        <div class="tx-title">${tx.note}</div>
-                        <div class="tx-meta">${dateStr} | ${metaText}</div>
-                    </div>
-                    <div class="tx-right">${amountText}</div>
-                </div>
-            </div>`;
+        const mdStr = `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+        const catName = tx.type === 'transfer' ? '轉帳' : (tx.category || '其他');
+        const iconHtml = tx.type === 'transfer'
+            ? '<svg viewBox="0 0 24 24"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>'
+            : getCategoryObj(catName, tx.type).emoji;
+        const notePart = tx.note ? `${tx.note} | ` : '';
+        return `<div class="tx-item-wrapper" id="tx-wrapper-${tx.id}"><div class="tx-actions"><div class="tx-btn tx-btn-edit" onclick="editTx(${tx.id})">編輯</div><div class="tx-btn tx-btn-del" onclick="delTx(${tx.id})">刪除</div></div><div class="tx-item type-${tx.type}" id="tx-item-${tx.id}" ontouchstart="swStart(event)" ontouchmove="swMove(event)" ontouchend="swEnd(event)"><div class="tx-left-group"><div class="tx-cat-icon">${iconHtml}</div><div class="tx-left"><div class="tx-title">${mdStr} | ${catName}</div><div class="tx-meta">${notePart}${accText}</div></div></div><div class="tx-right">${amountText}</div></div></div>`;
     }
 
-    function applyFilterAndSort(txList, filterId, sortId, searchKeyword = "") {
-        const filterVal = document.getElementById(filterId).value;
-        const sortVal = document.getElementById(sortId).value;
-        
-        if (filterVal !== 'all') txList = txList.filter(tx => tx.type === filterVal);
-        if (searchKeyword) txList = txList.filter(tx => tx.note.toLowerCase().includes(searchKeyword.toLowerCase()));
-        
-        txList.sort((a, b) => {
-            if (sortVal === 'date-desc') return b.timestamp - a.timestamp;
-            if (sortVal === 'date-asc') return a.timestamp - b.timestamp;
-            if (sortVal === 'amount-desc') return b.amount - a.amount;
-            if (sortVal === 'amount-asc') return a.amount - b.amount;
-        });
+    function applyFilterAndSort(txList, filterId, sortId, kw = '') {
+        if (filterId) { const f = document.getElementById(filterId).value; if (f !== 'all') txList = txList.filter(t => t.type === f); }
+        if (kw) { const k = kw.toLowerCase(); txList = txList.filter(t => (t.note && t.note.toLowerCase().includes(k)) || (t.category && t.category.toLowerCase().includes(k))); }
+        const s = document.getElementById(sortId).value;
+        txList.sort((a, b) => s === 'date-desc' ? b.timestamp - a.timestamp : (s === 'date-asc' ? a.timestamp - b.timestamp : (s === 'amount-desc' ? b.amount - a.amount : a.amount - b.amount)));
         return txList;
     }
 
+    function renderDetailsPage() {
+        const y = viewingDate.getFullYear(), m = viewingDate.getMonth();
+        document.getElementById('details-month-title').innerText = `${y}年${m+1}月 每日明細`;
+        const startMs = new Date(y, m, 1, 0,0,0,0).getTime(), endMs = new Date(y, m+1, 0, 23,59,59,999).getTime();
+        const monthTx = db.transactions.filter(t => t.type !== 'adjust' && t.timestamp >= startMs && t.timestamp <= endMs).sort((a,b) => b.timestamp - a.timestamp);
+        let mInc = 0, mExp = 0;
+        const dayMap = {};
+        monthTx.forEach(tx => {
+            if (tx.type === 'income') mInc += tx.amount;
+            if (tx.type === 'expense') mExp += tx.amount;
+            const d = new Date(tx.timestamp), key = toDateKey(d);
+            if (!dayMap[key]) dayMap[key] = { date: d, inc: 0, exp: 0, txs: [] };
+            if (tx.type === 'income') dayMap[key].inc += tx.amount;
+            if (tx.type === 'expense') dayMap[key].exp += tx.amount;
+            dayMap[key].txs.push(tx);
+        });
+        document.getElementById('details-month-income').innerText = `+ ${mInc.toLocaleString()}`;
+        document.getElementById('details-month-expense').innerText = `- ${mExp.toLocaleString()}`;
+        const container = document.getElementById('details-days-container');
+        const keys = Object.keys(dayMap).sort((a,b) => b.localeCompare(a));
+        if (!keys.length) { container.innerHTML = '<div style="text-align:center; padding: 30px; color: var(--text-light); font-size: 14px;">本月尚無交易紀錄</div>'; return; }
+        container.innerHTML = '';
+        keys.forEach(k => {
+            const g = dayMap[k], ds = `${g.date.getFullYear()}/${String(g.date.getMonth()+1).padStart(2,'0')}/${String(g.date.getDate()).padStart(2,'0')} ${weekDays[g.date.getDay()]}`;
+            let html = `<div class="day-group-block"><div class="day-group-header"><span class="day-group-date">${ds}</span><div class="day-group-nums"><span class="day-group-inc">收 +${g.inc.toLocaleString()}</span><span class="day-group-exp">支 -${g.exp.toLocaleString()}</span></div></div>`;
+            g.txs.forEach(tx => html += generateTxHTML(tx));
+            html += '</div>';
+            container.insertAdjacentHTML('beforeend', html);
+        });
+    }
+
     function renderApp() {
-        updateGreeting();
-        resetAllSwipes(); 
-
-        const endOfDayMs = new Date(viewingDate).setHours(23, 59, 59, 999);
-        const startOfDayMs = new Date(viewingDate).setHours(0, 0, 0, 0);
-
+        resetAllSwipes();
+        const endOfDayMs = new Date(viewingDate).setHours(23,59,59,999), startOfDayMs = new Date(viewingDate).setHours(0,0,0,0);
         const { bal } = calculateCurrentBalances(endOfDayMs);
         updateChart(bal);
-        updateBudgetBar(); 
-        
+
         document.getElementById('acc-post-val').innerText = bal.post.toLocaleString();
         document.getElementById('acc-cash-val').innerText = bal.cash.toLocaleString();
         document.getElementById('acc-jko-val').innerText = bal.jko.toLocaleString();
         document.getElementById('acc-easy-val').innerText = bal.easycard.toLocaleString();
 
-        let homeTx = db.transactions.filter(tx => tx.type !== 'adjust' && tx.timestamp >= startOfDayMs && tx.timestamp <= endOfDayMs);
-        homeTx = applyFilterAndSort(homeTx, 'home-filter', 'home-sort');
+        // 首頁當日紀錄
+        let homeTx = applyFilterAndSort(db.transactions.filter(t => t.type !== 'adjust' && t.timestamp >= startOfDayMs && t.timestamp <= endOfDayMs), 'home-filter', 'home-sort');
+        let dailyNet = homeTx.reduce((s, t) => s + (t.type === 'income' ? t.amount : (t.type === 'expense' ? -t.amount : 0)), 0);
         const homeContainer = document.getElementById('tx-container');
-        homeContainer.innerHTML = homeTx.length === 0 ? '<div style="text-align:center; padding: 20px; color: var(--text-light); font-size: 14px;">當日無交易紀錄</div>' : '';
-        homeTx.forEach(tx => homeContainer.insertAdjacentHTML('beforeend', generateTxHTML(tx)));
+        homeContainer.innerHTML = `<div class="daily-summary-card"><span class="daily-summary-date">${viewingDate.getFullYear()}/${String(viewingDate.getMonth()+1).padStart(2,'0')}/${String(viewingDate.getDate()).padStart(2,'0')} ${weekDays[viewingDate.getDay()]}</span><span class="daily-summary-total ${dailyNet < 0 ? 'neg' : (dailyNet > 0 ? 'pos' : 'zero')}">$ ${dailyNet > 0 ? '+' : ''}${dailyNet.toLocaleString()}</span></div>`;
+        if (!homeTx.length) homeContainer.insertAdjacentHTML('beforeend', '<div style="text-align:center; padding: 20px; color: var(--text-light); font-size: 14px;">當日無交易紀錄</div>');
+        else homeTx.forEach(t => homeContainer.insertAdjacentHTML('beforeend', generateTxHTML(t)));
 
-        let startDateMs, endDateMs;
-        const y = viewingDate.getFullYear();
-        const m = viewingDate.getMonth();
-        
-        endDateMs = new Date(viewingDate).setHours(23, 59, 59, 999);
-        if (ledgerRangeDays === 365) {
-            startDateMs = new Date(y, 0, 1).getTime();
-            endDateMs = new Date(y, 11, 31, 23, 59, 59, 999).getTime();
-            document.getElementById('ledger-income-label').innerText = '本年總收入';
-            document.getElementById('ledger-expense-label').innerText = '本年總支出';
-        } else if (ledgerRangeDays === 30) {
-            startDateMs = new Date(y, m, 1).getTime();
-            endDateMs = new Date(y, m + 1, 0, 23, 59, 59, 999).getTime();
-            document.getElementById('ledger-income-label').innerText = '本月總收入';
-            document.getElementById('ledger-expense-label').innerText = '本月總支出';
+        // 明細頁
+        renderDetailsPage();
+
+        // 查帳頁
+        const rangeInfo = getLedgerRangeInfo(), isInc = ledgerFlowType === 'income', flowLabel = isInc ? '收入' : '支出';
+        document.getElementById('ledger-income-label').innerText = `${rangeInfo.labelPrefix}總收入`;
+        document.getElementById('ledger-expense-label').innerText = `${rangeInfo.labelPrefix}總支出`;
+        const rangeTx = db.transactions.filter(t => t.type !== 'adjust' && t.timestamp >= rangeInfo.startMs && t.timestamp <= rangeInfo.endMs);
+        let totInc = 0, totExp = 0;
+        rangeTx.forEach(t => { if (t.type === 'income') totInc += t.amount; if (t.type === 'expense') totExp += t.amount; });
+        document.getElementById('ledger-month-income').innerText = `+ ${totInc.toLocaleString()}`;
+        document.getElementById('ledger-month-expense').innerText = `- ${totExp.toLocaleString()}`;
+
+        const flowTx = rangeTx.filter(t => t.type === ledgerFlowType);
+        const pieResult = updateLedgerChart(flowTx, rangeInfo);
+        const ledgerContainer = document.getElementById('ledger-tx-container'), searchInput = document.getElementById('ledger-search'), filterRow = document.getElementById('ledger-filter-controls-row'), detailTitle = document.getElementById('ledger-detail-title');
+
+        if (ledgerChartType === 'pie') {
+            detailTitle.innerText = `類別${flowLabel}明細`;
+            searchInput.classList.add('hidden'); filterRow.classList.add('hidden');
+            const { sortedCats, total } = pieResult;
+            ledgerContainer.innerHTML = `<div class="daily-summary-card"><span class="daily-summary-date">${rangeInfo.rangeTitle} 總${flowLabel}</span><span class="daily-summary-total ${total > 0 ? (isInc ? 'pos' : 'neg') : 'zero'}">$ ${total > 0 ? (isInc ? '+' : '-') : ''}${total.toLocaleString()}</span></div>`;
+            if (!sortedCats.length) ledgerContainer.insertAdjacentHTML('beforeend', `<div style="text-align:center; padding: 20px; color: var(--text-light); font-size: 14px;">該區間無${flowLabel}紀錄</div>`);
+            else sortedCats.forEach(([catName, amt]) => {
+                const catObj = getCategoryObj(catName, ledgerFlowType), pct = total > 0 ? ((amt / total) * 100).toFixed(1) : '0.0';
+                ledgerContainer.insertAdjacentHTML('beforeend', `<div class="cat-summary-card" onclick="openCategoryDetailModal('${catName}')"><div class="cat-summary-left"><div class="cat-summary-icon" style="background:${catObj.color}">${catObj.emoji}</div><div><div class="cat-summary-name">${catName}</div><div class="cat-summary-pct">${pct}%</div></div></div><div class="cat-summary-right ${isInc ? 'income' : ''}"><span>$ ${isInc ? '+' : '-'}${amt.toLocaleString()}</span><span class="cat-summary-arrow">❯</span></div></div>`);
+            });
         } else {
-            startDateMs = new Date(viewingDate).setDate(viewingDate.getDate() - ledgerRangeDays + 1);
-            startDateMs = new Date(startDateMs).setHours(0, 0, 0, 0);
-            document.getElementById('ledger-income-label').innerText = `近${ledgerRangeDays}天總收入`;
-            document.getElementById('ledger-expense-label').innerText = `近${ledgerRangeDays}天總支出`;
+            detailTitle.innerText = `${flowLabel}明細`;
+            searchInput.classList.remove('hidden'); filterRow.classList.remove('hidden');
+            let displayTx = applyFilterAndSort(flowTx, null, 'ledger-sort', searchInput.value);
+            let sumFlow = displayTx.reduce((s, t) => s + t.amount, 0);
+            ledgerContainer.innerHTML = `<div class="daily-summary-card"><span class="daily-summary-date">${rangeInfo.rangeTitle}</span><span class="daily-summary-total ${sumFlow > 0 ? (isInc ? 'pos' : 'neg') : 'zero'}">$ ${sumFlow > 0 ? (isInc ? '+' : '-') : ''}${sumFlow.toLocaleString()}</span></div>`;
+            if (!displayTx.length) ledgerContainer.insertAdjacentHTML('beforeend', `<div style="text-align:center; padding: 20px; color: var(--text-light); font-size: 14px;">查無${flowLabel}紀錄</div>`);
+            else displayTx.forEach(t => ledgerContainer.insertAdjacentHTML('beforeend', generateTxHTML(t)));
         }
-
-        let rangeTx = db.transactions.filter(tx => tx.type !== 'adjust' && tx.timestamp >= startDateMs && tx.timestamp <= endDateMs);
-        
-        let totalIncome = 0; let totalExpense = 0;
-        rangeTx.forEach(tx => {
-            if (tx.type === 'income') totalIncome += tx.amount;
-            if (tx.type === 'expense') totalExpense += tx.amount;
-        });
-        document.getElementById('ledger-month-income').innerText = `+ ${totalIncome.toLocaleString()}`;
-        document.getElementById('ledger-month-expense').innerText = `- ${totalExpense.toLocaleString()}`;
-        
-        updateLineChart(db.transactions); 
-
-        const searchKw = document.getElementById('ledger-search').value;
-        let displayTx = applyFilterAndSort(rangeTx, 'ledger-filter', 'ledger-sort', searchKw);
-        
-        const ledgerContainer = document.getElementById('ledger-tx-container');
-        ledgerContainer.innerHTML = displayTx.length === 0 ? '<div style="text-align:center; padding: 20px; color: var(--text-light); font-size: 14px;">查無交易紀錄</div>' : '';
-        displayTx.forEach(tx => ledgerContainer.insertAdjacentHTML('beforeend', generateTxHTML(tx)));
     }
 
     function setTxType(type) {
         currentType = type;
         document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(`tab-${type}`).classList.add('active');
-        const singleG = document.getElementById('group-single-acc');
-        const transG = document.getElementById('group-transfer-acc');
-        const sLabel = document.getElementById('label-single-acc');
-
-        if (type === 'transfer') {
-            singleG.classList.add('hidden'); transG.classList.remove('hidden');
-        } else {
-            singleG.classList.remove('hidden'); transG.classList.add('hidden');
-            sLabel.innerText = type === 'expense' ? '付款帳戶' : '收款帳戶';
-        }
+        const isTr = type === 'transfer';
+        document.getElementById('group-single-acc').classList.toggle('hidden', isTr);
+        document.getElementById('group-transfer-acc').classList.toggle('hidden', !isTr);
+        document.getElementById('group-category').classList.toggle('hidden', isTr);
+        if (!isTr) { document.getElementById('label-single-acc').innerText = type === 'expense' ? '付款帳戶' : '收款帳戶'; renderCategoryGrid(); }
     }
 
     function saveTransaction() {
-        const amount = parseFloat(document.getElementById('tx-amount').value);
-        const note = document.getElementById('tx-note').value;
-        
-        if (!amount || amount <= 0 || !note) { showAlert('請填寫金額與備註喔！'); return; }
-        
-        const acc = document.getElementById('tx-single-acc').value;
-        const fAcc = document.getElementById('tx-from-acc').value;
-        const tAcc = document.getElementById('tx-to-acc').value;
+        closeCalc();
+        const amount = parseFloat(evaluateCalcExpr(document.getElementById('tx-amount').value));
+        const note = document.getElementById('tx-note').value.trim();
+        if (!amount || amount <= 0) { showAlert('請填寫正確的金額喔！'); return; }
+        const acc = document.getElementById('tx-single-acc').value, fAcc = document.getElementById('tx-from-acc').value, tAcc = document.getElementById('tx-to-acc').value;
+        if (currentType === 'transfer' && fAcc === tAcc) { showAlert('轉出跟轉入不能是同一個帳戶！'); return; }
 
-        if (currentType === 'transfer' && fAcc === tAcc) { 
-            showAlert('轉出跟轉入不能是同一個帳戶！'); 
-            return; 
-        }
-        
+        const now = new Date();
+        const txTs = new Date(txModalDate.getFullYear(), txModalDate.getMonth(), txModalDate.getDate(), now.getHours(), now.getMinutes(), now.getSeconds()).getTime();
         if (editingTxId) {
             const idx = db.transactions.findIndex(t => t.id === editingTxId);
             if (idx > -1) {
-                db.transactions[idx] = { 
-                    ...db.transactions[idx], 
-                    type: currentType, 
-                    amount: amount, 
-                    note: note, 
-                    singleAcc: acc, 
-                    fromAcc: fAcc, 
-                    toAcc: tAcc 
-                };
+                const finalTs = (toDateKey(txModalDate) !== toDateKey(new Date(db.transactions[idx].timestamp))) ? txTs : db.transactions[idx].timestamp;
+                db.transactions[idx] = { ...db.transactions[idx], timestamp: finalTs, type: currentType, amount, category: currentType === 'transfer' ? '轉帳' : selectedCategory, note, singleAcc: acc, fromAcc: fAcc, toAcc: tAcc };
             }
-            editingTxId = null; 
+            editingTxId = null;
         } else {
-            let newTx = { id: Date.now(), timestamp: Date.now(), type: currentType, amount: amount, note: note };
-            if (currentType === 'transfer') {
-                newTx.fromAcc = fAcc; newTx.toAcc = tAcc;
-            } else { 
-                newTx.singleAcc = acc; 
-            }
+            let newTx = { id: Date.now(), timestamp: txTs, type: currentType, amount, category: currentType === 'transfer' ? '轉帳' : selectedCategory, note };
+            if (currentType === 'transfer') { newTx.fromAcc = fAcc; newTx.toAcc = tAcc; } else newTx.singleAcc = acc;
             db.transactions.push(newTx);
         }
-        
-        saveDB(); 
-        viewingDate = new Date(); 
-        formatViewingDate();
-        closeModal();
-        
-        switchPage('home');
-        isHistoryExpanded = true;
-        document.getElementById('tx-container').classList.add('expanded');
-        document.getElementById('history-header').classList.add('open');
-        renderApp();
-        setTimeout(() => { document.getElementById('tx-container').scrollIntoView({behavior: 'smooth', block: 'end'}); }, 350);
+        saveDB(); viewingDate = new Date(txTs); formatViewingDate(); closeModal(); switchPage('home');
+        isHistoryExpanded = true; document.getElementById('tx-container').classList.add('expanded'); document.getElementById('history-header').classList.add('open');
+        renderApp(); setTimeout(() => document.getElementById('tx-container').scrollIntoView({ behavior: 'smooth', block: 'end' }), 350);
     }
 
     function openModal() {
-        editingTxId = null;
-        document.getElementById('modal-title').style.display = 'none';
-        document.getElementById('btn-save-tx').innerText = '記錄';
-        
-        const modal = document.getElementById('add-modal');
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
-        document.getElementById('tx-amount').value = '';
-        document.getElementById('tx-note').value = '';
-        setTxType('expense');
-        renderQuickNotes();
-        trackModal(true);
+        editingTxId = null; document.getElementById('modal-title').style.display = 'none'; document.getElementById('btn-save-tx').innerText = '記錄';
+        txModalDate = new Date(viewingDate); formatTxDate();
+        selectedCategory = '吃'; document.getElementById('tx-single-acc').value = 'cash'; renderAccountGrid();
+        const m = document.getElementById('add-modal'); m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10);
+        document.getElementById('tx-amount').value = ''; document.getElementById('tx-note').value = ''; closeCalc(); setTxType('expense'); trackModal(true);
     }
-    
-    function closeModal(event) {
-        if(event) {
-            const modal = document.getElementById('add-modal');
-            modal.classList.remove('show');
-            setTimeout(() => modal.style.display = 'none', 300);
-        } else {
-            const modal = document.getElementById('add-modal');
-            modal.classList.remove('show');
-            setTimeout(() => modal.style.display = 'none', 300);
-        }
-        editingTxId = null;
-        trackModal(false);
-    }
+    function closeModal() { closeCalc(); const m = document.getElementById('add-modal'); m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 300); editingTxId = null; trackModal(false); }
 
     function openAdjustHistoryModal() {
-        const list = document.getElementById('adjust-history-list');
-        list.innerHTML = '';
+        const list = document.getElementById('adjust-history-list'); list.innerHTML = '';
         const adjustTxs = db.transactions.filter(t => t.type === 'adjust').sort((a,b) => b.timestamp - a.timestamp);
-        
-        if (adjustTxs.length === 0) {
-            list.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-light); font-size: 14px;">尚無戶口修改記錄</div>';
-        } else {
+        if (!adjustTxs.length) list.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-light); font-size: 14px;">尚無戶口修改記錄</div>';
+        else {
             let groups = [];
-            adjustTxs.forEach(tx => {
-                let group = groups.find(g => Math.abs(g.ts - tx.timestamp) < 50);
-                if (group) group.txs.push(tx);
-                else groups.push({ ts: tx.timestamp, txs: [tx] });
-            });
-            
+            adjustTxs.forEach(tx => { let g = groups.find(x => Math.abs(x.ts - tx.timestamp) < 50); if (g) g.txs.push(tx); else groups.push({ ts: tx.timestamp, txs: [tx] }); });
             groups.forEach(g => {
-                const d = new Date(g.ts);
-                const dateStr = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-                
-                let detailLines = g.txs.map(tx => `${accNames[tx.singleAcc]}：${tx.amount.toLocaleString()}`).join('<br>');
-                
-                list.innerHTML += `
-                    <div class="history-record-item">
-                        <div class="history-record-time">${dateStr}</div>
-                        <div class="history-record-detail">${detailLines}</div>
-                    </div>
-                `;
+                const d = new Date(g.ts), ds = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                let lines = g.txs.map(tx => (tx.prevAmount != null && tx.prevAmount !== tx.amount) ? `${accNames[tx.singleAcc]}：${tx.prevAmount.toLocaleString()} -> ${tx.amount.toLocaleString()}` : `${accNames[tx.singleAcc]}：${tx.amount.toLocaleString()}`).join('<br>');
+                list.innerHTML += `<div class="history-record-item"><div class="history-record-time">${ds}</div><div class="history-record-detail">${lines}</div></div>`;
             });
         }
-        
-        const modal = document.getElementById('adjust-history-modal');
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
-        trackModal(true);
+        const m = document.getElementById('adjust-history-modal'); m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10); trackModal(true);
     }
-    function closeAdjustHistoryModal() {
-        const modal = document.getElementById('adjust-history-modal');
-        modal.classList.remove('show');
-        setTimeout(() => modal.style.display = 'none', 300);
-        trackModal(false);
-    }
+    function closeAdjustHistoryModal() { const m = document.getElementById('adjust-history-modal'); m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 300); trackModal(false); }
 
     function openBalanceModal() {
         const { bal } = calculateCurrentBalances(Date.now());
-        document.getElementById('init-post').value = bal.post;
-        document.getElementById('init-cash').value = bal.cash;
-        document.getElementById('init-jko').value = bal.jko;
-        document.getElementById('init-easycard').value = bal.easycard;
-        const modal = document.getElementById('balance-modal');
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
-        trackModal(true);
+        document.getElementById('init-post').value = bal.post; document.getElementById('init-cash').value = bal.cash;
+        document.getElementById('init-jko').value = bal.jko; document.getElementById('init-easycard').value = bal.easycard;
+        const m = document.getElementById('balance-modal'); m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10); trackModal(true);
     }
-    function closeBalanceModal() {
-        const modal = document.getElementById('balance-modal');
-        modal.classList.remove('show');
-        setTimeout(() => modal.style.display = 'none', 300);
-        trackModal(false);
-    }
+    function closeBalanceModal() { const m = document.getElementById('balance-modal'); m.classList.remove('show'); setTimeout(() => m.style.display = 'none', 300); trackModal(false); }
     function saveInitialBalances() {
-        const newPost = parseFloat(document.getElementById('init-post').value) || 0;
-        const newCash = parseFloat(document.getElementById('init-cash').value) || 0;
-        const newJko = parseFloat(document.getElementById('init-jko').value) || 0;
-        const newEasy = parseFloat(document.getElementById('init-easycard').value) || 0;
-        
-        const ts = Date.now();
-        db.transactions.push({ id: ts, timestamp: ts, type: 'adjust', singleAcc: 'post', amount: newPost, note: '系統校正' });
-        db.transactions.push({ id: ts+1, timestamp: ts+1, type: 'adjust', singleAcc: 'cash', amount: newCash, note: '系統校正' });
-        db.transactions.push({ id: ts+2, timestamp: ts+2, type: 'adjust', singleAcc: 'jko', amount: newJko, note: '系統校正' });
-        db.transactions.push({ id: ts+3, timestamp: ts+3, type: 'adjust', singleAcc: 'easycard', amount: newEasy, note: '系統校正' });
-        
-        saveDB(); 
-        closeBalanceModal(); 
-        viewingDate = new Date(); 
-        formatViewingDate(); 
-        
-        showAlert('餘額校正成功！', () => switchPage('home'));
+        const { bal: prevBal } = calculateCurrentBalances(Date.now());
+        const nP = parseFloat(document.getElementById('init-post').value) || 0, nC = parseFloat(document.getElementById('init-cash').value) || 0;
+        const nJ = parseFloat(document.getElementById('init-jko').value) || 0, nE = parseFloat(document.getElementById('init-easycard').value) || 0, ts = Date.now();
+        db.transactions.push({ id: ts, timestamp: ts, type: 'adjust', singleAcc: 'post', prevAmount: prevBal.post, amount: nP, note: '系統校正' });
+        db.transactions.push({ id: ts+1, timestamp: ts+1, type: 'adjust', singleAcc: 'cash', prevAmount: prevBal.cash, amount: nC, note: '系統校正' });
+        db.transactions.push({ id: ts+2, timestamp: ts+2, type: 'adjust', singleAcc: 'jko', prevAmount: prevBal.jko, amount: nJ, note: '系統校正' });
+        db.transactions.push({ id: ts+3, timestamp: ts+3, type: 'adjust', singleAcc: 'easycard', prevAmount: prevBal.easycard, amount: nE, note: '系統校正' });
+        saveDB(); closeBalanceModal(); viewingDate = new Date(); formatViewingDate(); showAlert('餘額校正成功！', () => switchPage('home'));
     }
 
     function exportData() {
-        const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-        a.download = '記帳備份.json';
+        const cleanTx = (db.transactions || []).map(tx => {
+            const item = { id: tx.id, timestamp: tx.timestamp, type: tx.type, amount: tx.amount, note: tx.note || '' };
+            if (tx.type === 'adjust') { item.singleAcc = tx.singleAcc; if (tx.prevAmount != null) item.prevAmount = tx.prevAmount; }
+            else if (tx.type === 'transfer') { item.category = '轉帳'; item.fromAcc = tx.fromAcc; item.toAcc = tx.toAcc; }
+            else { item.category = tx.category || (tx.type === 'income' ? '其他' : '吃'); item.singleAcc = tx.singleAcc; }
+            return item;
+        });
+        const url = URL.createObjectURL(new Blob([JSON.stringify({ transactions: cleanTx }, null, 2)], { type: 'application/json' }));
+        const a = document.createElement('a'); a.href = url; a.download = '記帳備份.json';
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        showAlert('資料匯出成功！'); 
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
     function importData() { document.getElementById('import-file').click(); }
-    function handleImport(event) {
-        const file = event.target.files[0]; if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const importedData = JSON.parse(e.target.result);
-                if (importedData && importedData.transactions) {
-                    db = importedData;
-                    if (!db.quickNotes) db.quickNotes = ['午餐', '晚餐', '飲料', '交通'];
-                    if (db.monthlyBudget === undefined) db.monthlyBudget = 0;
-                    saveDB(); 
-                    viewingDate = new Date(); formatViewingDate(); renderApp(); 
-                    showAlert("資料匯入成功！", () => switchPage('home')); 
-                } else showAlert("檔案格式不正確喔！");
-            } catch (err) { showAlert("讀取檔案失敗！"); }
-            event.target.value = ''; 
+    function handleImport(e) {
+        const f = e.target.files[0]; if (!f) return;
+        const r = new FileReader();
+        r.onload = (ev) => {
+            let parsed;
+            try { parsed = JSON.parse(String(ev.target.result || '').replace(/^\uFEFF/, '').trim()); }
+            catch (err) { e.target.value = ''; showAlert('檔案格式損毀，無法解析 JSON！'); return; }
+            if (!parsed || !Array.isArray(parsed.transactions)) { e.target.value = ''; showAlert('檔案格式不正確喔！'); return; }
+            db = {
+                transactions: parsed.transactions.map(tx => {
+                    if ((tx.type === 'expense' || tx.type === 'income') && !tx.category) tx.category = tx.type === 'income' ? '其他' : '吃';
+                    return tx;
+                })
+            };
+            saveDB(); viewingDate = new Date(); formatViewingDate(); e.target.value = '';
+            try { renderApp(); showAlert('資料匯入成功！', () => switchPage('home')); }
+            catch (err) { console.error(err); showAlert('資料已存檔，但畫面更新出錯：' + err.message); }
         };
-        reader.readAsText(file);
+        r.onerror = () => { e.target.value = ''; showAlert('讀取檔案失敗！'); };
+        r.readAsText(f);
     }
 
-    function toggleTheme() {
-        const body = document.body;
-        body.classList.toggle('dark-mode');
-        updateThemeMeta();
-        localStorage.setItem('pure_money_theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
-        renderApp(); 
-    }
-    
-    if(localStorage.getItem('pure_money_theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-    }
-    updateThemeMeta(); 
-
-    formatViewingDate();
-    handleUrlParams();
-    renderApp();
+    function toggleTheme() { document.body.classList.toggle('dark-mode'); updateThemeMeta(); localStorage.setItem('pure_money_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); renderApp(); }
+    if (localStorage.getItem('pure_money_theme') === 'dark') document.body.classList.add('dark-mode');
+    updateThemeMeta(); formatViewingDate(); handleUrlParams(); renderApp();
 </script>
 </body>
 </html>
