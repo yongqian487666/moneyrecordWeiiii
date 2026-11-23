@@ -17,7 +17,7 @@
             --bg-top: #f6f7f8; --bg-bottom: #f4f6f8;
             --card-bg: rgba(236, 247, 255, 0.88);
             --card-strong: rgba(216, 239, 255, 0.92);
-            --tx-bg: rgba(247, 252, 255, 0.94);
+            --tx-bg: #f7fcff;
             --card-border: rgba(123, 202, 245, 0.38);
             --card-shadow: 0 4px 14px rgba(100, 175, 225, 0.12);
             --text-main: #2c3e50; --text-light: #6b7c8c; --accent: #6ec1f2;
@@ -32,7 +32,7 @@
             --bg-top: #1a2a3a; --bg-bottom: #121a20;
             --card-bg: rgba(30, 42, 54, 0.94);
             --card-strong: rgba(38, 54, 70, 0.95);
-            --tx-bg: rgba(32, 44, 56, 0.95);
+            --tx-bg: #202c38;
             --card-border: rgba(91, 155, 213, 0.25);
             --card-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
             --text-main: #f0f0f0; --text-light: #aaaaaa; --accent: #5b9bd5;
@@ -135,7 +135,8 @@
         .tx-list { display: flex; flex-direction: column; gap: 12px; overflow: hidden; max-height: 0; transition: max-height 0.4s cubic-bezier(0, 1, 0, 1); margin-top: 10px; }
         .tx-list.expanded { max-height: 8000px; transition: max-height 0.5s ease-in-out; }
         .tx-item-wrapper { position: relative; overflow: hidden; border-radius: 16px; box-shadow: var(--card-shadow); background-color: var(--tx-bg); border: 1.5px solid var(--card-border); height: 76px; flex-shrink: 0; }
-        .tx-actions { position: absolute; top: 0; bottom: 0; right: 0; display: flex; z-index: 1; }
+        .tx-actions { position: absolute; top: 0; bottom: 0; right: 0; display: flex; z-index: 1; opacity: 0; transition: opacity 0.2s; }
+        .tx-item-wrapper:has(.tx-item.swiped) .tx-actions { opacity: 1; }
         .tx-btn { width: 65px; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 14px; cursor: pointer; }
         .tx-btn-edit { background-color: #5b9bd5; }
         .tx-btn-del { background-color: #ff7b89; }
@@ -1020,28 +1021,29 @@
     }
 
     function renderDetailsPage() {
-        const y = viewingDate.getFullYear(), m = viewingDate.getMonth();
-        const startMs = new Date(y, m, 1, 0,0,0,0).getTime(), endMs = new Date(y, m+1, 0, 23,59,59,999).getTime();
-        const monthTx = db.transactions.filter(t => t.type !== 'adjust' && t.timestamp >= startMs && t.timestamp <= endMs).sort((a,b) => b.timestamp - a.timestamp);
-        const dayMap = {};
-        monthTx.forEach(tx => {
-            const d = new Date(tx.timestamp), key = toDateKey(d);
-            if (!dayMap[key]) dayMap[key] = { date: d, inc: 0, exp: 0, txs: [] };
-            if (tx.type === 'income') dayMap[key].inc += tx.amount;
-            if (tx.type === 'expense') dayMap[key].exp += tx.amount;
-            dayMap[key].txs.push(tx);
+        const startOfDayMs = new Date(viewingDate).setHours(0, 0, 0, 0);
+        const endOfDayMs = new Date(viewingDate).setHours(23, 59, 59, 999);
+        const dayTx = db.transactions
+            .filter(t => t.type !== 'adjust' && t.timestamp >= startOfDayMs && t.timestamp <= endOfDayMs)
+            .sort((a, b) => b.timestamp - a.timestamp);
+
+        let inc = 0, exp = 0;
+        dayTx.forEach(tx => {
+            if (tx.type === 'income') inc += tx.amount;
+            if (tx.type === 'expense') exp += tx.amount;
         });
+
+        const ds = `${viewingDate.getFullYear()}/${String(viewingDate.getMonth() + 1).padStart(2, '0')}/${String(viewingDate.getDate()).padStart(2, '0')} ${weekDays[viewingDate.getDay()]}`;
         const container = document.getElementById('details-days-container');
-        const keys = Object.keys(dayMap).sort((a,b) => b.localeCompare(a));
-        if (!keys.length) { container.innerHTML = '<div style="text-align:center; padding: 30px; color: var(--text-light); font-size: 14px;">本月尚無交易紀錄</div>'; return; }
-        container.innerHTML = '';
-        keys.forEach(k => {
-            const g = dayMap[k], ds = `${g.date.getFullYear()}/${String(g.date.getMonth()+1).padStart(2,'0')}/${String(g.date.getDate()).padStart(2,'0')} ${weekDays[g.date.getDay()]}`;
-            let html = `<div class="day-group-block"><div class="day-group-header"><span class="day-group-date">${ds}</span><div class="day-group-nums"><span class="day-group-inc">收 +${g.inc.toLocaleString()}</span><span class="day-group-exp">支 -${g.exp.toLocaleString()}</span></div></div>`;
-            g.txs.forEach(tx => html += generateTxHTML(tx, true));
-            html += '</div>';
-            container.insertAdjacentHTML('beforeend', html);
-        });
+        let html = `<div class="day-group-block"><div class="day-group-header"><span class="day-group-date">${ds}</span><div class="day-group-nums"><span class="day-group-inc">收 +${inc.toLocaleString()}</span><span class="day-group-exp">支 -${exp.toLocaleString()}</span></div></div>`;
+
+        if (!dayTx.length) {
+            html += '<div style="text-align:center; padding: 24px; color: var(--text-light); font-size: 14px;">當日無交易紀錄</div>';
+        } else {
+            dayTx.forEach(tx => html += generateTxHTML(tx, true));
+        }
+        html += '</div>';
+        container.innerHTML = html;
     }
 
     function renderApp() {
