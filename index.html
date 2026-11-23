@@ -51,8 +51,32 @@
         .snowflake:nth-child(9) { left: 85%; animation-duration: 12s, 4s; animation-delay: 2.5s, 1s; font-size: 24px; }
         .snowflake:nth-child(10) { left: 95%; animation-duration: 10s, 3s; animation-delay: 4.5s, 2s; font-size: 18px; }
 
-        .bg-decor { position: fixed; bottom: 80px; right: -10px; width: 240px; pointer-events: none; z-index: 0; opacity: 0.75; mix-blend-mode: multiply; filter: contrast(1.15) brightness(1.06); }
-        body.dark-mode .bg-decor { opacity: 0.35; mix-blend-mode: screen; filter: invert(1) hue-rotate(180deg) contrast(1.2); }
+        .bg-layer {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom));
+    pointer-events: none;
+    z-index: 0;
+    isolation: isolate;
+}
+.bg-decor {
+    position: absolute;
+    bottom: 80px;
+    right: -10px;
+    width: 240px;
+    pointer-events: none;
+    opacity: 0.85;
+    mix-blend-mode: multiply;
+    filter: contrast(1.2) brightness(1.08);
+    /* 邊緣柔化，徹底消除任何紙紋接縫 */
+    -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 65%, transparent 100%);
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 65%, transparent 100%);
+}
+body.dark-mode .bg-decor {
+    opacity: 0.35;
+    mix-blend-mode: screen;
+    filter: invert(1) hue-rotate(180deg) contrast(1.2);
+}
 
         .app-container { max-width: 480px; margin: 0 auto; padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: calc(100px + env(safe-area-inset-bottom)); position: relative; z-index: 1; }
         .page { display: none; animation: fadeIn 0.3s ease-out; min-height: calc(100dvh - 150px); }
@@ -281,9 +305,9 @@
     <div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div>
 </div>
 
-<!-- 背景圖片：自動嘗試 bg.png / bg.jpg / bg.PNG / bg.JPG，找不到則自動隱藏 -->
-<img src="bg.png" class="bg-decor" alt="" onerror="if(!this.dataset.t){this.dataset.t='1';this.src='bg.jpg';}else if(this.dataset.t==='1'){this.dataset.t='2';this.src='bg.PNG';}else if(this.dataset.t==='2'){this.dataset.t='3';this.src='bg.JPG';}else{this.style.display='none';}">
-
+<div class="bg-layer">
+    <img src="bg.png" class="bg-decor" alt="" onerror="if(!this.dataset.t){this.dataset.t='1';this.src='bg.jpg';}else if(this.dataset.t==='1'){this.dataset.t='2';this.src='bg.PNG';}else if(this.dataset.t==='2'){this.dataset.t='3';this.src='bg.JPG';}else{this.style.display='none';}">
+</div>
 <div class="loader-overlay" id="loading"><div class="loader-icon">&#10054;</div></div>
 
 <div class="app-container" id="swipe-container">
