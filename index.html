@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
         :root {
-            --bg-top: #aaddf9; --bg-bottom: #e8f4fa; --card-bg: rgba(255, 255, 255, 0.95);
+            --bg-top: #f6f7f8; --bg-bottom: #f4f6f8; --card-bg: rgba(255, 255, 255, 0.95);
             --text-main: #333333; --text-light: #777777; --accent: #7bcaf5;
             --expense: #ff7b89; --transfer: #a0a0a0; --nav-bg: #ffffff; --border-color: #e0e0e0;
             --calendar-bg: #ffffff; --calendar-header: #f0f8ff; --calendar-text: #333333;
@@ -36,7 +36,7 @@
         body { background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom)); color: var(--text-main); min-height: 100vh; min-height: 100dvh; overflow-x: hidden; overscroll-behavior-y: none; transition: background 0.3s ease; }
 
         .snowflakes { position: fixed; top: -10vh; left: 0; width: 100vw; height: 110vh; pointer-events: none; z-index: 0; overflow: hidden; }
-        .snowflake { position: absolute; top: -10vh; color: rgba(255, 255, 255, 0.8); font-family: Arial, sans-serif; animation-name: snowflakes-fall, snowflakes-shake; animation-timing-function: linear, ease-in-out; animation-iteration-count: infinite, infinite; }
+        .snowflake { position: absolute; top: -10vh; color: rgba(123, 202, 245, 0.45); font-family: Arial, sans-serif; animation-name: snowflakes-fall, snowflakes-shake; animation-timing-function: linear, ease-in-out; animation-iteration-count: infinite, infinite; }
         body.dark-mode .snowflake { color: rgba(255, 255, 255, 0.15); }
         @keyframes snowflakes-fall { 0% { top: -10vh; } 100% { top: 110vh; } }
         @keyframes snowflakes-shake { 0% { transform: translateX(0px); } 50% { transform: translateX(30px); } 100% { transform: translateX(0px); } }
@@ -51,13 +51,18 @@
         .snowflake:nth-child(9) { left: 85%; animation-duration: 12s, 4s; animation-delay: 2.5s, 1s; font-size: 24px; }
         .snowflake:nth-child(10) { left: 95%; animation-duration: 10s, 3s; animation-delay: 4.5s, 2s; font-size: 18px; }
 
-        .bg-layer {
+       .bg-layer {
     position: fixed;
     inset: 0;
-    background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom));
+    background-color: #f6f7f8;
+    /* 產生跟原圖一樣的素描紙顆粒質感 */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 0;
     isolation: isolate;
+}
+body.dark-mode .bg-layer {
+    background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom));
 }
 .bg-decor {
     position: absolute;
@@ -65,12 +70,11 @@
     right: -10px;
     width: 240px;
     pointer-events: none;
-    opacity: 0.85;
+    opacity: 0.95;
     mix-blend-mode: multiply;
-    filter: contrast(1.2) brightness(1.08);
-    /* 邊緣柔化，徹底消除任何紙紋接縫 */
-    -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 65%, transparent 100%);
-    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 65%, transparent 100%);
+    filter: contrast(1.08) brightness(1.03);
+    -webkit-mask-image: radial-gradient(ellipse 72% 72% at 50% 50%, #000 55%, transparent 100%);
+    mask-image: radial-gradient(ellipse 72% 72% at 50% 50%, #000 55%, transparent 100%);
 }
 body.dark-mode .bg-decor {
     opacity: 0.35;
@@ -699,7 +703,7 @@ body.dark-mode .bg-decor {
     let openModalsCount = 0;
     function updateThemeMeta() {
         const m = document.getElementById('theme-color-meta'), isDark = document.body.classList.contains('dark-mode');
-        m.setAttribute('content', openModalsCount > 0 ? (isDark ? '#111b26' : '#6e8fa2') : (isDark ? '#1a2a3a' : '#aaddf9'));
+        m.setAttribute('content', openModalsCount > 0 ? (isDark ? '#111b26' : '#6e8fa2') : (isDark ? '#1a2a3a' : '#f6f7f8'));
     }
     function trackModal(isOpen) { openModalsCount = isOpen ? openModalsCount + 1 : Math.max(0, openModalsCount - 1); updateThemeMeta(); }
 
