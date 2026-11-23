@@ -63,33 +63,10 @@
         .snowflake:nth-child(9) { left: 85%; animation-duration: 12s, 4s; animation-delay: 2.5s, 1s; font-size: 24px; }
         .snowflake:nth-child(10) { left: 95%; animation-duration: 10s, 3s; animation-delay: 4.5s, 2s; font-size: 18px; }
 
-        /* 滿版紙感星星背景 */
-        .bg-layer {
-            position: fixed;
-            inset: 0;
-            background-color: var(--bg-top);
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-        body.dark-mode .bg-layer {
-            background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom));
-        }
-        .bg-decor {
-         position: absolute;
-         bottom: 90px; right: 0;
-         width: 100%;
-         height: 100%;
-         object-fit: cover;
-         object-position: right bottom;
-         pointer-events: none;
-         opacity: 1;
-         }
-        body.dark-mode .bg-decor {
-            opacity: 0.25;
-            mix-blend-mode: screen;
-            filter: invert(1) hue-rotate(180deg) contrast(1.2);
-        }
+        .bg-layer { position: fixed; inset: 0; background-color: var(--bg-top); pointer-events: none; z-index: 0; overflow: hidden; }
+        body.dark-mode .bg-layer { background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom)); }
+        .bg-decor { position: absolute; bottom: 85px; right: 0; width: 100%; height: 100%; object-fit: cover; object-position: right bottom; pointer-events: none; opacity: 1; }
+        body.dark-mode .bg-decor { opacity: 0.25; mix-blend-mode: screen; filter: invert(1) hue-rotate(180deg) contrast(1.2); }
 
         .app-container { max-width: 480px; margin: 0 auto; padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: calc(100px + env(safe-area-inset-bottom)); position: relative; z-index: 2; }
         .page { display: none; animation: fadeIn 0.3s ease-out; min-height: calc(100dvh - 150px); }
@@ -109,8 +86,15 @@
 
         .dashboard { background: var(--card-bg); border: 1.5px solid var(--card-border); border-radius: 22px; padding: 20px; text-align: center; box-shadow: var(--card-shadow); margin-bottom: 15px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
         .dashboard h2 { font-size: 17px; font-weight: bold; color: var(--text-light); margin-bottom: 5px; }
-        #total-balance-display { font-size: 38px; font-weight: 900; color: var(--accent); letter-spacing: 0.5px; margin-bottom: 15px; }
-        .chart-container { position: relative; height: 220px; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 10px; }
+        #total-balance-display { font-size: 38px; font-weight: 900; color: var(--accent); letter-spacing: 0.5px; margin-bottom: 12px; }
+        .home-analysis { background: rgba(255, 255, 255, 0.65); border: 1px solid var(--card-border); border-radius: 14px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: var(--text-light); line-height: 1.6; text-align: left; }
+        body.dark-mode .home-analysis { background: rgba(0, 0, 0, 0.2); }
+        .home-analysis strong { color: var(--text-main); font-weight: bold; }
+        .home-analysis .pos { color: #3a9ad9; font-weight: bold; }
+        body.dark-mode .home-analysis .pos { color: var(--accent); }
+        .home-analysis .neg { color: var(--expense); font-weight: bold; }
+
+        .chart-container { position: relative; height: 220px; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 8px; }
         .pie-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; text-align: left; padding: 12px 14px; background: rgba(255, 255, 255, 0.55); border-radius: 14px; border: 1px solid var(--card-border); }
         body.dark-mode .pie-legend { background: rgba(0, 0, 0, 0.18); }
         .legend-item { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: bold; color: var(--text-main); }
@@ -124,19 +108,29 @@
         .daily-summary-total.pos { color: var(--accent); }
         .daily-summary-total.zero { color: var(--text-light); }
 
+        .details-controls-card { background: var(--card-bg); border: 1.5px solid var(--card-border); border-radius: 18px; padding: 12px; margin-bottom: 14px; box-shadow: var(--card-shadow); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; flex-direction: column; gap: 10px; }
+        .details-controls-card .time-range-btns { margin-bottom: 0; }
+        .detail-filter-btns { display: flex; gap: 6px; }
+        .detail-filter-btn { flex: 1; padding: 6px 4px; font-size: 12.5px; font-weight: bold; border-radius: 10px; border: 1.5px solid var(--card-border); background: rgba(255, 255, 255, 0.65); color: var(--text-light); cursor: pointer; transition: 0.2s; }
+        body.dark-mode .detail-filter-btn { background: rgba(0, 0, 0, 0.2); }
+        .detail-filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+        .detail-filter-btn.active-expense { background: var(--expense); border-color: var(--expense); color: white; }
+        .detail-filter-btn.active-transfer { background: var(--transfer); border-color: var(--transfer); color: white; }
+
         .day-group-block { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
-        .day-group-header { background: var(--card-strong); border: 1.5px solid var(--card-border); border-radius: 14px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--card-shadow); }
-        .day-group-date { font-size: 14px; font-weight: bold; color: var(--text-main); }
-        .day-group-nums { display: flex; gap: 10px; font-size: 13px; font-weight: 900; }
+        .day-group-header { background: var(--card-strong); border: 1.5px solid var(--card-border); border-radius: 14px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; gap: 8px; box-shadow: var(--card-shadow); }
+        .day-group-date { font-size: 13.5px; font-weight: bold; color: var(--text-main); }
+        .day-group-nums { display: flex; gap: 10px; font-size: 13px; font-weight: 900; white-space: nowrap; }
         .day-group-inc { color: #3a9ad9; }
         body.dark-mode .day-group-inc { color: var(--accent); }
         .day-group-exp { color: var(--expense); }
+        .day-group-tr { color: var(--transfer); }
 
         .tx-list { display: flex; flex-direction: column; gap: 12px; overflow: hidden; max-height: 0; transition: max-height 0.4s cubic-bezier(0, 1, 0, 1); margin-top: 10px; }
         .tx-list.expanded { max-height: 8000px; transition: max-height 0.5s ease-in-out; }
         .tx-item-wrapper { position: relative; overflow: hidden; border-radius: 16px; box-shadow: var(--card-shadow); background-color: var(--tx-bg); border: 1.5px solid var(--card-border); height: 76px; flex-shrink: 0; }
-        .tx-actions { position: absolute; top: 0; bottom: 0; right: 0; display: flex; z-index: 1; opacity: 0; transition: opacity 0.2s; }
-        .tx-item-wrapper:has(.tx-item.swiped) .tx-actions { opacity: 1; }
+        .tx-actions { position: absolute; top: 0; bottom: 0; right: 0; display: flex; z-index: 1; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        .tx-item-wrapper.swiped-wrap .tx-actions, .tx-item-wrapper:has(.tx-item.swiped) .tx-actions { opacity: 1; pointer-events: auto; }
         .tx-btn { width: 65px; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 14px; cursor: pointer; }
         .tx-btn-edit { background-color: #5b9bd5; }
         .tx-btn-del { background-color: #ff7b89; }
@@ -369,6 +363,7 @@
         <div class="dashboard">
             <h2>淨累積資產 TWD</h2>
             <div id="total-balance-display">0</div>
+            <div class="home-analysis" id="home-analysis"></div>
             <div class="chart-container"><canvas id="myChart"></canvas></div>
             <div class="pie-legend" id="pie-legend"></div>
         </div>
@@ -435,7 +430,21 @@
 
     <!-- 3. 明細頁 -->
     <div class="page" id="page-details">
-        <h2 style="text-align: center; margin-bottom: 15px; font-weight: bold; color: var(--text-main);">每日明細</h2>
+        <h2 style="text-align: center; margin-bottom: 14px; font-weight: bold; color: var(--text-main);">每日明細</h2>
+        <div class="details-controls-card">
+            <div class="time-range-btns">
+                <button class="time-btn active" id="btn-det-range-1" onclick="setDetailsRange(1)">今日</button>
+                <button class="time-btn" id="btn-det-range-7" onclick="setDetailsRange(7)">7天</button>
+                <button class="time-btn" id="btn-det-range-15" onclick="setDetailsRange(15)">半月</button>
+                <button class="time-btn" id="btn-det-range-30" onclick="setDetailsRange(30)">本月</button>
+            </div>
+            <div class="detail-filter-btns">
+                <button class="detail-filter-btn active" id="btn-det-filter-all" onclick="setDetailsFilter('all')">全部</button>
+                <button class="detail-filter-btn" id="btn-det-filter-expense" onclick="setDetailsFilter('expense')">支出</button>
+                <button class="detail-filter-btn" id="btn-det-filter-income" onclick="setDetailsFilter('income')">收入</button>
+                <button class="detail-filter-btn" id="btn-det-filter-transfer" onclick="setDetailsFilter('transfer')">轉帳</button>
+            </div>
+        </div>
         <div id="details-days-container"></div>
     </div>
 
@@ -659,6 +668,7 @@
     let selectedCategory = '吃', currentType = 'expense', currentPage = 'home';
     let myPieChart = null, myLedgerChart = null;
     let ledgerChartType = 'line', ledgerFlowType = 'expense', ledgerRangeDays = 30;
+    let detailsRangeDays = 1, detailsFilterType = 'all';
     let editingTxId = null, targetDeleteId = null, bubbleTimer = null;
     let viewingDate = new Date(), txModalDate = new Date(), calDate = new Date(), calendarTarget = 'main';
     let db = JSON.parse(localStorage.getItem('pure_money_db')) || { transactions: [] };
@@ -807,10 +817,19 @@
     function swMove(e) {}
     function swEnd(e) {
         const ex = e.changedTouches[0].clientX, ey = e.changedTouches[0].clientY, cur = e.currentTarget;
-        if (Math.abs(ex - itemStartX) > Math.abs(ey - itemStartY) && itemStartX - ex > 40) { resetAllSwipes(); cur.classList.add('swiped'); }
-        else if (ex - itemStartX > 40) cur.classList.remove('swiped');
+        if (Math.abs(ex - itemStartX) > Math.abs(ey - itemStartY) && itemStartX - ex > 40) {
+            resetAllSwipes();
+            cur.classList.add('swiped');
+            if (cur.parentElement) cur.parentElement.classList.add('swiped-wrap');
+        } else if (ex - itemStartX > 40) {
+            cur.classList.remove('swiped');
+            if (cur.parentElement) cur.parentElement.classList.remove('swiped-wrap');
+        }
     }
-    function resetAllSwipes() { document.querySelectorAll('.tx-item.swiped').forEach(el => el.classList.remove('swiped')); }
+    function resetAllSwipes() {
+        document.querySelectorAll('.tx-item.swiped').forEach(el => el.classList.remove('swiped'));
+        document.querySelectorAll('.tx-item-wrapper.swiped-wrap').forEach(el => el.classList.remove('swiped-wrap'));
+    }
 
     function editTx(id) {
         resetAllSwipes(); closeCategoryDetailModal();
@@ -854,6 +873,54 @@
         else { viewingDate = new Date(y, m, d); formatViewingDate(); closeCalendar(); renderApp(); }
     }
 
+    // 首頁總資產分析語（以頂部日期為截止日）
+    function updateHomeAnalysis(balObj, endOfDayMs) {
+        const el = document.getElementById('home-analysis');
+        const entries = accKeys.map(k => ({ name: accNames[k], val: balObj[k] }));
+        const sum = entries.reduce((a, b) => a + b.val, 0);
+        const y = viewingDate.getFullYear(), m = viewingDate.getMonth();
+        const mStart = new Date(y, m, 1, 0, 0, 0, 0).getTime();
+        const mdStr = `${String(m + 1).padStart(2, '0')}/${String(viewingDate.getDate()).padStart(2, '0')}`;
+
+        const monthTx = db.transactions.filter(t => t.type !== 'adjust' && t.timestamp >= mStart && t.timestamp <= endOfDayMs);
+        let mInc = 0, mExp = 0;
+        const catExp = {};
+        monthTx.forEach(t => {
+            if (t.type === 'income') mInc += t.amount;
+            if (t.type === 'expense') {
+                mExp += t.amount;
+                const c = t.category || '吃';
+                catExp[c] = (catExp[c] || 0) + t.amount;
+            }
+        });
+
+        const hasAnyTx = db.transactions.some(t => t.timestamp <= endOfDayMs);
+        if (!hasAnyTx && sum === 0) {
+            el.innerHTML = `截至 <strong>${mdStr}</strong> 尚無紀錄，點下方「+」或到設置校正餘額開始記帳吧 ✨`;
+            return;
+        }
+
+        const net = mInc - mExp;
+        const netHtml = net >= 0 ? `<span class="pos">+${net.toLocaleString()}</span>` : `<span class="neg">${net.toLocaleString()}</span>`;
+        let line1 = `截至 <strong>${mdStr}</strong>，本月收支結餘 ${netHtml}（收 ${mInc.toLocaleString()} / 支 ${mExp.toLocaleString()}）`;
+
+        let line2Parts = [];
+        const positiveEntries = entries.filter(e => e.val > 0).sort((a, b) => b.val - a.val);
+        if (positiveEntries.length > 0 && sum > 0) {
+            const topAcc = positiveEntries[0];
+            const pct = Math.round((topAcc.val / sum) * 100);
+            line2Parts.push(`主力帳戶為 <strong>${topAcc.name}</strong>（佔 ${pct}%）`);
+        }
+        const topCat = Object.entries(catExp).sort((a, b) => b[1] - a[1])[0];
+        if (topCat) {
+            const emoji = getCategoryObj(topCat[0], 'expense').emoji;
+            line2Parts.push(`本月最常花在 <strong>${topCat[0]}</strong> ${emoji}`);
+        } else {
+            line2Parts.push(`本月目前零支出，守財超棒！`);
+        }
+        el.innerHTML = `${line1}<br>${line2Parts.join('，')}`;
+    }
+
     function updateChart(balObj) {
         const ctx = document.getElementById('myChart'), isDark = document.body.classList.contains('dark-mode');
         const dataVals = [balObj.post, balObj.cash, balObj.jko, balObj.easycard];
@@ -871,7 +938,7 @@
         ['郵局','現金','街口','悠游卡'].forEach((l, i) => { leg.innerHTML += `<div class="legend-item"><div class="legend-left"><span class="legend-color" style="background:${accColors[i]}"></span><span>${l}</span></div><span style="font-size:16px;">${dataVals[i].toLocaleString()}</span></div>`; });
     }
 
-    function setLedgerRange(days) { ledgerRangeDays = days; document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active')); document.getElementById(`btn-range-${days}`).classList.add('active'); renderApp(); }
+    function setLedgerRange(days) { ledgerRangeDays = days; document.querySelectorAll('#page-ledger .time-btn').forEach(b => b.classList.remove('active')); document.getElementById(`btn-range-${days}`).classList.add('active'); renderApp(); }
     function setLedgerFlow(flow) {
         ledgerFlowType = flow;
         document.getElementById('btn-flow-expense').className = 'flow-btn' + (flow === 'expense' ? ' active-expense' : '');
@@ -890,21 +957,22 @@
         }
     }
 
+    // 查帳區間：皆以頂部日期為截止日，後面日期的記錄不算
     function getLedgerRangeInfo() {
         const y = viewingDate.getFullYear(), m = viewingDate.getMonth();
-        let startDate, endDate, labelPrefix, rangeTitle;
+        const endDate = new Date(viewingDate); endDate.setHours(23, 59, 59, 999);
+        const endStr = `${y}/${String(m + 1).padStart(2, '0')}/${String(viewingDate.getDate()).padStart(2, '0')}`;
+        let startDate, labelPrefix, rangeTitle;
         if (ledgerRangeDays === 'all') {
-            const valid = db.transactions.filter(t => t.type !== 'adjust');
-            startDate = new Date(valid.length ? Math.min(...valid.map(t => t.timestamp)) : viewingDate); startDate.setHours(0,0,0,0);
-            endDate = new Date(valid.length ? Math.max(...valid.map(t => t.timestamp)) : viewingDate); endDate.setHours(23,59,59,999);
-            labelPrefix = '全部'; rangeTitle = '全部記錄';
+            const valid = db.transactions.filter(t => t.type !== 'adjust' && t.timestamp <= endDate.getTime());
+            startDate = new Date(valid.length ? Math.min(...valid.map(t => t.timestamp)) : viewingDate); startDate.setHours(0, 0, 0, 0);
+            labelPrefix = '全部'; rangeTitle = `截至 ${endStr}`;
         } else if (ledgerRangeDays === 365) {
-            startDate = new Date(y, 0, 1, 0,0,0,0); endDate = new Date(y, 11, 31, 23,59,59,999); labelPrefix = '本年'; rangeTitle = `${y}年`;
+            startDate = new Date(y, 0, 1, 0, 0, 0, 0); labelPrefix = '本年'; rangeTitle = `本年 · 截至 ${endStr}`;
         } else if (ledgerRangeDays === 30) {
-            startDate = new Date(y, m, 1, 0,0,0,0); endDate = new Date(y, m+1, 0, 23,59,59,999); labelPrefix = '本月'; rangeTitle = `${y}/${String(m+1).padStart(2,'0')} 本月`;
+            startDate = new Date(y, m, 1, 0, 0, 0, 0); labelPrefix = '本月'; rangeTitle = `本月 · 截至 ${endStr}`;
         } else {
-            endDate = new Date(viewingDate); endDate.setHours(23,59,59,999);
-            startDate = new Date(viewingDate); startDate.setDate(endDate.getDate() - ledgerRangeDays + 1); startDate.setHours(0,0,0,0);
+            startDate = new Date(viewingDate); startDate.setDate(endDate.getDate() - ledgerRangeDays + 1); startDate.setHours(0, 0, 0, 0);
             labelPrefix = `近${ledgerRangeDays}天`;
             rangeTitle = `${String(startDate.getMonth()+1).padStart(2,'0')}/${String(startDate.getDate()).padStart(2,'0')} - ${String(endDate.getMonth()+1).padStart(2,'0')}/${String(endDate.getDate()).padStart(2,'0')}`;
         }
@@ -940,8 +1008,9 @@
         const daySpan = Math.max(1, Math.round((endDate - startDate) / 86400000) + 1);
         const groupByMonth = (ledgerRangeDays === 365) || (ledgerRangeDays === 'all' && daySpan > 90);
         if (ledgerRangeDays === 365) {
-            for (let i = 1; i <= 12; i++) { dateLabels.push(`${i}月`); seriesData.push(0); }
-            flowTx.forEach(tx => { seriesData[new Date(tx.timestamp).getMonth()] += tx.amount; total += tx.amount; });
+            const maxMonth = endDate.getMonth() + 1;
+            for (let i = 1; i <= maxMonth; i++) { dateLabels.push(`${i}月`); seriesData.push(0); }
+            flowTx.forEach(tx => { const idx = new Date(tx.timestamp).getMonth(); if (idx < maxMonth) { seriesData[idx] += tx.amount; total += tx.amount; } });
         } else if (groupByMonth) {
             let curr = new Date(startDate.getFullYear(), startDate.getMonth(), 1), endM = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
             while (curr <= endM) { dateLabels.push(`${curr.getFullYear()}/${String(curr.getMonth()+1).padStart(2,'0')}`); seriesData.push(0); curr.setMonth(curr.getMonth()+1); }
@@ -951,7 +1020,8 @@
             while (curr <= endDate) { dateLabels.push(`${String(curr.getMonth()+1).padStart(2,'0')}/${String(curr.getDate()).padStart(2,'0')}`); seriesData.push(0); curr.setDate(curr.getDate()+1); }
             flowTx.forEach(tx => { const d = new Date(tx.timestamp), idx = dateLabels.indexOf(`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`); if (idx !== -1) { seriesData[idx] += tx.amount; total += tx.amount; } });
         }
-        const avgText = ledgerRangeDays === 365 ? `平均每月${flowLabel}約 <strong>${Math.round(total/12).toLocaleString()}</strong> 元` : `平均每日${flowLabel}約 <strong>${Math.round(total/daySpan).toLocaleString()}</strong> 元`;
+        const monthCount = Math.max(1, endDate.getMonth() + 1);
+        const avgText = ledgerRangeDays === 365 ? `平均每月${flowLabel}約 <strong>${Math.round(total/monthCount).toLocaleString()}</strong> 元` : `平均每日${flowLabel}約 <strong>${Math.round(total/daySpan).toLocaleString()}</strong> 元`;
         document.getElementById('chart-desc').innerHTML = `${rangeInfo.labelPrefix}的總${flowLabel}為 <strong>${total.toLocaleString()}</strong> 元，${avgText}。`;
 
         const lineColor = isInc ? '#5ab4eb' : '#ff7b89', fillColor = isInc ? 'rgba(90, 180, 235, 0.16)' : 'rgba(255, 123, 137, 0.14)';
@@ -1020,27 +1090,68 @@
         return txList;
     }
 
+    // 明細頁區間與篩選控制
+    function setDetailsRange(days) {
+        detailsRangeDays = days;
+        document.querySelectorAll('#page-details .time-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-det-range-${days}`).classList.add('active');
+        renderDetailsPage();
+    }
+    function setDetailsFilter(type) {
+        detailsFilterType = type;
+        document.querySelectorAll('.detail-filter-btn').forEach(b => b.className = 'detail-filter-btn');
+        const btn = document.getElementById(`btn-det-filter-${type}`);
+        if (type === 'expense') btn.classList.add('active-expense');
+        else if (type === 'transfer') btn.classList.add('active-transfer');
+        else btn.classList.add('active');
+        renderDetailsPage();
+    }
+
     function renderDetailsPage() {
-        const startOfDayMs = new Date(viewingDate).setHours(0, 0, 0, 0);
-        const endOfDayMs = new Date(viewingDate).setHours(23, 59, 59, 999);
-        const dayTx = db.transactions
-            .filter(t => t.type !== 'adjust' && t.timestamp >= startOfDayMs && t.timestamp <= endOfDayMs)
+        const endDate = new Date(viewingDate); endDate.setHours(23, 59, 59, 999);
+        const startDate = new Date(viewingDate);
+        let rangeLabel = '今日';
+        if (detailsRangeDays === 1) {
+            startDate.setHours(0, 0, 0, 0);
+            rangeLabel = '今日';
+        } else if (detailsRangeDays === 30) {
+            startDate.setDate(1); startDate.setHours(0, 0, 0, 0);
+            rangeLabel = '本月';
+        } else {
+            startDate.setDate(startDate.getDate() - detailsRangeDays + 1);
+            startDate.setHours(0, 0, 0, 0);
+            rangeLabel = detailsRangeDays === 15 ? '半月' : '近7天';
+        }
+
+        let rangeTx = db.transactions
+            .filter(t => t.type !== 'adjust' && t.timestamp >= startDate.getTime() && t.timestamp <= endDate.getTime())
             .sort((a, b) => b.timestamp - a.timestamp);
 
-        let inc = 0, exp = 0;
-        dayTx.forEach(tx => {
+        if (detailsFilterType !== 'all') {
+            rangeTx = rangeTx.filter(t => t.type === detailsFilterType);
+        }
+
+        let inc = 0, exp = 0, tr = 0;
+        rangeTx.forEach(tx => {
             if (tx.type === 'income') inc += tx.amount;
-            if (tx.type === 'expense') exp += tx.amount;
+            else if (tx.type === 'expense') exp += tx.amount;
+            else if (tx.type === 'transfer') tr += tx.amount;
         });
 
-        const ds = `${viewingDate.getFullYear()}/${String(viewingDate.getMonth() + 1).padStart(2, '0')}/${String(viewingDate.getDate()).padStart(2, '0')} ${weekDays[viewingDate.getDay()]}`;
-        const container = document.getElementById('details-days-container');
-        let html = `<div class="day-group-block"><div class="day-group-header"><span class="day-group-date">${ds}</span><div class="day-group-nums"><span class="day-group-inc">收 +${inc.toLocaleString()}</span><span class="day-group-exp">支 -${exp.toLocaleString()}</span></div></div>`;
+        const cutoffStr = `${viewingDate.getFullYear()}/${String(viewingDate.getMonth() + 1).padStart(2, '0')}/${String(viewingDate.getDate()).padStart(2, '0')}`;
+        let summaryNums = '';
+        if (detailsFilterType === 'expense') summaryNums = `<span class="day-group-exp">支 -${exp.toLocaleString()}</span>`;
+        else if (detailsFilterType === 'income') summaryNums = `<span class="day-group-inc">收 +${inc.toLocaleString()}</span>`;
+        else if (detailsFilterType === 'transfer') summaryNums = `<span class="day-group-tr">轉 ${tr.toLocaleString()}</span>`;
+        else summaryNums = `<span class="day-group-inc">收 +${inc.toLocaleString()}</span><span class="day-group-exp">支 -${exp.toLocaleString()}</span>`;
 
-        if (!dayTx.length) {
-            html += '<div style="text-align:center; padding: 24px; color: var(--text-light); font-size: 14px;">當日無交易紀錄</div>';
+        const container = document.getElementById('details-days-container');
+        let html = `<div class="day-group-block"><div class="day-group-header"><span class="day-group-date">${rangeLabel} · 截至 ${cutoffStr}</span><div class="day-group-nums">${summaryNums}</div></div>`;
+
+        if (!rangeTx.length) {
+            html += '<div style="text-align:center; padding: 24px; color: var(--text-light); font-size: 14px;">此區間無符合的交易紀錄</div>';
         } else {
-            dayTx.forEach(tx => html += generateTxHTML(tx, true));
+            rangeTx.forEach(tx => html += generateTxHTML(tx, false));
         }
         html += '</div>';
         container.innerHTML = html;
@@ -1048,9 +1159,10 @@
 
     function renderApp() {
         resetAllSwipes();
-        const endOfDayMs = new Date(viewingDate).setHours(23,59,59,999);
+        const endOfDayMs = new Date(viewingDate).setHours(23, 59, 59, 999);
         const { bal } = calculateCurrentBalances(endOfDayMs);
         updateChart(bal);
+        updateHomeAnalysis(bal, endOfDayMs);
 
         document.getElementById('acc-post-val').innerText = bal.post.toLocaleString();
         document.getElementById('acc-cash-val').innerText = bal.cash.toLocaleString();
@@ -1076,7 +1188,7 @@
             detailTitle.innerText = `類別${flowLabel}明細`;
             searchInput.classList.add('hidden'); filterRow.classList.add('hidden');
             const { sortedCats, total } = pieResult;
-            ledgerContainer.innerHTML = `<div class="daily-summary-card"><span class="daily-summary-date">${rangeInfo.rangeTitle} 總${flowLabel}</span><span class="daily-summary-total ${total > 0 ? (isInc ? 'pos' : 'neg') : 'zero'}">$ ${total > 0 ? (isInc ? '+' : '-') : ''}${total.toLocaleString()}</span></div>`;
+            ledgerContainer.innerHTML = `<div class="daily-summary-card"><span class="daily-summary-date">${rangeInfo.rangeTitle}</span><span class="daily-summary-total ${total > 0 ? (isInc ? 'pos' : 'neg') : 'zero'}">$ ${total > 0 ? (isInc ? '+' : '-') : ''}${total.toLocaleString()}</span></div>`;
             if (!sortedCats.length) ledgerContainer.insertAdjacentHTML('beforeend', `<div style="text-align:center; padding: 20px; color: var(--text-light); font-size: 14px;">該區間無${flowLabel}紀錄</div>`);
             else sortedCats.forEach(([catName, amt]) => {
                 const catObj = getCategoryObj(catName, ledgerFlowType), pct = total > 0 ? ((amt / total) * 100).toFixed(1) : '0.0';
@@ -1184,7 +1296,7 @@
             return item;
         });
         const url = URL.createObjectURL(new Blob([JSON.stringify({ transactions: cleanTx }, null, 2)], { type: 'application/json' }));
-        const a = document.createElement('a'); a.href = url; a.download = '記帳備份.json';
+        const a = document.createElement('a'); a.href = url; a.download = `記帳備份_${toDateKey(new Date())}.json`;
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
