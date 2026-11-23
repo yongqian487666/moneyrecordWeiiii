@@ -51,19 +51,9 @@
         .snowflake:nth-child(9) { left: 85%; animation-duration: 12s, 4s; animation-delay: 2.5s, 1s; font-size: 24px; }
         .snowflake:nth-child(10) { left: 95%; animation-duration: 10s, 3s; animation-delay: 4.5s, 2s; font-size: 18px; }
 
-        .bg-decor { 
-         position: fixed; bottom: 80px; right: -10px; 
-         width: 240px; pointer-events: none; z-index: 0;
-         opacity: 0.75;
-         mix-blend-mode: multiply; /* 讓白色背景完全透明，只留藍線 */
-         filter: contrast(1.15) brightness(1.06); /* 清除微微的紙張灰底 */
-         }
-         /* 深色模式下改用濾色，讓線條變成淡藍發光、一樣不會有方框 */
-         body.dark-mode .bg-decor { 
-         opacity: 0.35;
-         mix-blend-mode: screen;
-         filter: invert(1) hue-rotate(180deg) contrast(1.2);
-            }
+        .bg-decor { position: fixed; bottom: 80px; right: -10px; width: 240px; pointer-events: none; z-index: 0; opacity: 0.75; mix-blend-mode: multiply; filter: contrast(1.15) brightness(1.06); }
+        body.dark-mode .bg-decor { opacity: 0.35; mix-blend-mode: screen; filter: invert(1) hue-rotate(180deg) contrast(1.2); }
+
         .app-container { max-width: 480px; margin: 0 auto; padding: 20px; padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: calc(100px + env(safe-area-inset-bottom)); position: relative; z-index: 1; }
         .page { display: none; animation: fadeIn 0.3s ease-out; min-height: calc(100dvh - 150px); }
         .page.active { display: block; }
@@ -88,12 +78,6 @@
         .legend-left { display: flex; align-items: center; gap: 8px; }
         .legend-color { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
 
-        .history-header { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
-        .history-toggle { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 15px; color: var(--text-main); cursor: pointer; }
-        .history-header.open .arrow { transform: rotate(180deg); }
-        .arrow { transition: transform 0.3s; color: var(--text-light); font-size: 12px; }
-        .history-controls { display: flex; gap: 8px; }
-
         .daily-summary-card { background: var(--card-bg); border-radius: 14px; padding: 13px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-weight: bold; flex-shrink: 0; }
         .daily-summary-date { font-size: 14px; color: var(--text-main); }
         .daily-summary-total { font-size: 16px; font-weight: 900; }
@@ -101,7 +85,6 @@
         .daily-summary-total.pos { color: var(--accent); }
         .daily-summary-total.zero { color: var(--text-light); }
 
-        /* 明細頁每日分組卡片 */
         .day-group-block { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
         .day-group-header { background: var(--card-bg); border-radius: 14px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .day-group-date { font-size: 14px; font-weight: bold; color: var(--text-main); }
@@ -216,7 +199,6 @@
         .modal-date-btn:active { background: rgba(0,0,0,0.06); }
         .modal-date-display { font-size: 15px; font-weight: bold; color: var(--text-main); cursor: pointer; padding: 4px 10px; letter-spacing: 0.5px; }
 
-        /* 4 帳戶格子 */
         .acc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 1px; }
         .acc-grid-item { padding: 11px 4px; border-radius: 12px; border: 1.5px solid var(--border-color); background: transparent; color: var(--text-light); font-size: 13px; font-weight: bold; text-align: center; cursor: pointer; transition: 0.2s ease; white-space: nowrap; }
         .acc-grid-item.active { border-color: var(--accent); background: rgba(123, 202, 245, 0.16); color: var(--accent); }
@@ -299,7 +281,8 @@
     <div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div><div class="snowflake">&#10054;</div>
 </div>
 
-<img src="bg.jpg" class="bg-decor" alt="">
+<!-- 背景圖片：自動嘗試 bg.png / bg.jpg / bg.PNG / bg.JPG，找不到則自動隱藏 -->
+<img src="bg.png" class="bg-decor" alt="" onerror="if(!this.dataset.t){this.dataset.t='1';this.src='bg.jpg';}else if(this.dataset.t==='1'){this.dataset.t='2';this.src='bg.PNG';}else if(this.dataset.t==='2'){this.dataset.t='3';this.src='bg.JPG';}else{this.style.display='none';}">
 
 <div class="loader-overlay" id="loading"><div class="loader-icon">&#10054;</div></div>
 
@@ -316,7 +299,7 @@
         </div>
     </header>
 
-    <!-- 1. 首頁 -->
+    <!-- 1. 首頁 (預設開啟) -->
     <div class="page active" id="page-home">
         <div class="dashboard">
             <h2>淨累積資產 TWD</h2>
@@ -324,32 +307,6 @@
             <div class="chart-container"><canvas id="myChart"></canvas></div>
             <div class="pie-legend" id="pie-legend"></div>
         </div>
-        <div class="history-header open" id="history-header">
-            <div class="history-toggle" onclick="toggleHistory()"><span>當日歷史記錄</span><span class="arrow">▼</span></div>
-            <div class="history-controls">
-                <div class="custom-select-wrapper inline" id="home-filter-wrapper">
-                    <div class="custom-select inline" onclick="toggleSelect('home-filter-wrapper')">全部</div>
-                    <div class="custom-options">
-                        <div class="custom-option selected" onclick="selectOption('home-filter-wrapper', 'all', '全部', renderApp)">全部</div>
-                        <div class="custom-option" onclick="selectOption('home-filter-wrapper', 'expense', '支出', renderApp)">支出</div>
-                        <div class="custom-option" onclick="selectOption('home-filter-wrapper', 'income', '收入', renderApp)">收入</div>
-                        <div class="custom-option" onclick="selectOption('home-filter-wrapper', 'transfer', '轉帳', renderApp)">轉帳</div>
-                    </div>
-                    <input type="hidden" id="home-filter" value="all">
-                </div>
-                <div class="custom-select-wrapper inline" id="home-sort-wrapper">
-                    <div class="custom-select inline" onclick="toggleSelect('home-sort-wrapper')">新到舊</div>
-                    <div class="custom-options">
-                        <div class="custom-option selected" onclick="selectOption('home-sort-wrapper', 'date-desc', '新到舊', renderApp)">新到舊</div>
-                        <div class="custom-option" onclick="selectOption('home-sort-wrapper', 'date-asc', '舊到新', renderApp)">舊到新</div>
-                        <div class="custom-option" onclick="selectOption('home-sort-wrapper', 'amount-desc', '高到低', renderApp)">高到低</div>
-                        <div class="custom-option" onclick="selectOption('home-sort-wrapper', 'amount-asc', '低到高', renderApp)">低到高</div>
-                    </div>
-                    <input type="hidden" id="home-sort" value="date-desc">
-                </div>
-            </div>
-        </div>
-        <section class="tx-list expanded" id="tx-container"></section>
     </div>
 
     <!-- 2. 查帳頁 -->
@@ -411,13 +368,9 @@
         <section class="tx-list expanded" id="ledger-tx-container"></section>
     </div>
 
-    <!-- 3. 明細頁（每日收支總覽） -->
+    <!-- 3. 明細頁 -->
     <div class="page" id="page-details">
-        <h2 style="text-align: center; margin-bottom: 15px; font-weight: bold; color: var(--text-main);" id="details-month-title">本月每日明細</h2>
-        <div class="ledger-summary">
-            <div class="ledger-summary-item"><span class="label">當月總支出</span><span class="amount expense" id="details-month-expense">0</span></div>
-            <div class="ledger-summary-item"><span class="label">當月總收入</span><span class="amount income" id="details-month-income">0</span></div>
-        </div>
+        <h2 style="text-align: center; margin-bottom: 15px; font-weight: bold; color: var(--text-main);">每日明細</h2>
         <div id="details-days-container"></div>
     </div>
 
@@ -617,7 +570,6 @@
     const accColors = ['#7bcaf5', '#ffb6c1', '#f1a9a0', '#b8c0ff'];
     const weekDays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
 
-    // 專屬支出類別 (9)
     const expenseCategories = [
         { name: '吃', emoji: '🍚', color: '#e65c72' },
         { name: '喝', emoji: '🧋', color: '#eb8f47' },
@@ -629,7 +581,6 @@
         { name: '繳費', emoji: '💰', color: '#9c78eb' },
         { name: '生活', emoji: '🛁', color: '#61d095' }
     ];
-    // 專屬收入類別 (7)
     const incomeCategories = [
         { name: '生活費', emoji: '🌱', color: '#61d095' },
         { name: '工讀費', emoji: '🧰', color: '#5a94f0' },
@@ -643,7 +594,7 @@
     let selectedCategory = '吃', currentType = 'expense', currentPage = 'home';
     let myPieChart = null, myLedgerChart = null;
     let ledgerChartType = 'line', ledgerFlowType = 'expense', ledgerRangeDays = 30;
-    let isHistoryExpanded = true, editingTxId = null, targetDeleteId = null, bubbleTimer = null;
+    let editingTxId = null, targetDeleteId = null, bubbleTimer = null;
     let viewingDate = new Date(), txModalDate = new Date(), calDate = new Date(), calendarTarget = 'main';
     let db = JSON.parse(localStorage.getItem('pure_money_db')) || { transactions: [] };
 
@@ -816,10 +767,6 @@
     function delTx(id) { targetDeleteId = id; document.getElementById('custom-confirm').classList.add('show'); trackModal(true); }
     function closeConfirmModal() { document.getElementById('custom-confirm').classList.remove('show'); targetDeleteId = null; resetAllSwipes(); trackModal(false); }
     function executeDeleteTx() { if (targetDeleteId !== null) { db.transactions = db.transactions.filter(t => t.id !== targetDeleteId); saveDB(); closeCategoryDetailModal(); renderApp(); } closeConfirmModal(); }
-    function toggleHistory() {
-        const l = document.getElementById('tx-container'), h = document.querySelector('.history-header');
-        isHistoryExpanded = !isHistoryExpanded; l.classList.toggle('expanded', isHistoryExpanded); h.classList.toggle('open', isHistoryExpanded);
-    }
 
     function formatViewingDate() { document.getElementById('date-display').innerText = `${viewingDate.getFullYear()}/${String(viewingDate.getMonth()+1).padStart(2,'0')}/${String(viewingDate.getDate()).padStart(2,'0')}`; }
     function changeDate(offset) { viewingDate.setDate(viewingDate.getDate() + offset); formatViewingDate(); renderApp(); }
@@ -961,7 +908,7 @@
         totEl.innerText = `$ ${isInc ? '+' : '-'}${total.toLocaleString()}`;
         const list = document.getElementById('cat-detail-list');
         list.innerHTML = catTxs.length === 0 ? '<div style="text-align:center; padding: 20px; color: var(--text-light); font-size: 14px;">查無記錄</div>' : '';
-        catTxs.forEach(tx => list.insertAdjacentHTML('beforeend', generateTxHTML(tx)));
+        catTxs.forEach(tx => list.insertAdjacentHTML('beforeend', generateTxHTML(tx, false)));
         const m = document.getElementById('category-detail-modal'); m.style.display = 'flex'; setTimeout(() => m.classList.add('show'), 10); trackModal(true);
     }
     function closeCategoryDetailModal() {
@@ -984,20 +931,21 @@
         return { bal, filteredTx };
     }
 
-    // 主標題為「日期 | 類別」（大字），下面才是備註與帳戶
-    function generateTxHTML(tx) {
+    // hideDate = true 時（明細頁）主標題只顯示類別，不重複顯示日期
+    function generateTxHTML(tx, hideDate = false) {
         let amountText = '', accText = '';
-        if (tx.type === 'expense') { amountText = `- ${tx.amount}`; accText = `${accNames[tx.singleAcc]} `; }
+        if (tx.type === 'expense') { amountText = `- ${tx.amount}`; accText = `從 ${accNames[tx.singleAcc]} 扣款`; }
         else if (tx.type === 'income') { amountText = `+ ${tx.amount}`; accText = `存入 ${accNames[tx.singleAcc]}`; }
         else if (tx.type === 'transfer') { amountText = `${tx.amount}`; accText = `${accNames[tx.fromAcc]} -> ${accNames[tx.toAcc]}`; }
         const d = new Date(tx.timestamp);
         const mdStr = `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
         const catName = tx.type === 'transfer' ? '轉帳' : (tx.category || '其他');
+        const titleText = hideDate ? catName : `${mdStr} | ${catName}`;
         const iconHtml = tx.type === 'transfer'
             ? '<svg viewBox="0 0 24 24"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>'
             : getCategoryObj(catName, tx.type).emoji;
         const notePart = tx.note ? `${tx.note} | ` : '';
-        return `<div class="tx-item-wrapper" id="tx-wrapper-${tx.id}"><div class="tx-actions"><div class="tx-btn tx-btn-edit" onclick="editTx(${tx.id})">編輯</div><div class="tx-btn tx-btn-del" onclick="delTx(${tx.id})">刪除</div></div><div class="tx-item type-${tx.type}" id="tx-item-${tx.id}" ontouchstart="swStart(event)" ontouchmove="swMove(event)" ontouchend="swEnd(event)"><div class="tx-left-group"><div class="tx-cat-icon">${iconHtml}</div><div class="tx-left"><div class="tx-title">${mdStr} | ${catName}</div><div class="tx-meta">${notePart}${accText}</div></div></div><div class="tx-right">${amountText}</div></div></div>`;
+        return `<div class="tx-item-wrapper" id="tx-wrapper-${tx.id}"><div class="tx-actions"><div class="tx-btn tx-btn-edit" onclick="editTx(${tx.id})">編輯</div><div class="tx-btn tx-btn-del" onclick="delTx(${tx.id})">刪除</div></div><div class="tx-item type-${tx.type}" id="tx-item-${tx.id}" ontouchstart="swStart(event)" ontouchmove="swMove(event)" ontouchend="swEnd(event)"><div class="tx-left-group"><div class="tx-cat-icon">${iconHtml}</div><div class="tx-left"><div class="tx-title">${titleText}</div><div class="tx-meta">${notePart}${accText}</div></div></div><div class="tx-right">${amountText}</div></div></div>`;
     }
 
     function applyFilterAndSort(txList, filterId, sortId, kw = '') {
@@ -1010,22 +958,16 @@
 
     function renderDetailsPage() {
         const y = viewingDate.getFullYear(), m = viewingDate.getMonth();
-        document.getElementById('details-month-title').innerText = `${y}年${m+1}月 每日明細`;
         const startMs = new Date(y, m, 1, 0,0,0,0).getTime(), endMs = new Date(y, m+1, 0, 23,59,59,999).getTime();
         const monthTx = db.transactions.filter(t => t.type !== 'adjust' && t.timestamp >= startMs && t.timestamp <= endMs).sort((a,b) => b.timestamp - a.timestamp);
-        let mInc = 0, mExp = 0;
         const dayMap = {};
         monthTx.forEach(tx => {
-            if (tx.type === 'income') mInc += tx.amount;
-            if (tx.type === 'expense') mExp += tx.amount;
             const d = new Date(tx.timestamp), key = toDateKey(d);
             if (!dayMap[key]) dayMap[key] = { date: d, inc: 0, exp: 0, txs: [] };
             if (tx.type === 'income') dayMap[key].inc += tx.amount;
             if (tx.type === 'expense') dayMap[key].exp += tx.amount;
             dayMap[key].txs.push(tx);
         });
-        document.getElementById('details-month-income').innerText = `+ ${mInc.toLocaleString()}`;
-        document.getElementById('details-month-expense').innerText = `- ${mExp.toLocaleString()}`;
         const container = document.getElementById('details-days-container');
         const keys = Object.keys(dayMap).sort((a,b) => b.localeCompare(a));
         if (!keys.length) { container.innerHTML = '<div style="text-align:center; padding: 30px; color: var(--text-light); font-size: 14px;">本月尚無交易紀錄</div>'; return; }
@@ -1033,7 +975,7 @@
         keys.forEach(k => {
             const g = dayMap[k], ds = `${g.date.getFullYear()}/${String(g.date.getMonth()+1).padStart(2,'0')}/${String(g.date.getDate()).padStart(2,'0')} ${weekDays[g.date.getDay()]}`;
             let html = `<div class="day-group-block"><div class="day-group-header"><span class="day-group-date">${ds}</span><div class="day-group-nums"><span class="day-group-inc">收 +${g.inc.toLocaleString()}</span><span class="day-group-exp">支 -${g.exp.toLocaleString()}</span></div></div>`;
-            g.txs.forEach(tx => html += generateTxHTML(tx));
+            g.txs.forEach(tx => html += generateTxHTML(tx, true));
             html += '</div>';
             container.insertAdjacentHTML('beforeend', html);
         });
@@ -1041,7 +983,7 @@
 
     function renderApp() {
         resetAllSwipes();
-        const endOfDayMs = new Date(viewingDate).setHours(23,59,59,999), startOfDayMs = new Date(viewingDate).setHours(0,0,0,0);
+        const endOfDayMs = new Date(viewingDate).setHours(23,59,59,999);
         const { bal } = calculateCurrentBalances(endOfDayMs);
         updateChart(bal);
 
@@ -1050,18 +992,8 @@
         document.getElementById('acc-jko-val').innerText = bal.jko.toLocaleString();
         document.getElementById('acc-easy-val').innerText = bal.easycard.toLocaleString();
 
-        // 首頁當日紀錄
-        let homeTx = applyFilterAndSort(db.transactions.filter(t => t.type !== 'adjust' && t.timestamp >= startOfDayMs && t.timestamp <= endOfDayMs), 'home-filter', 'home-sort');
-        let dailyNet = homeTx.reduce((s, t) => s + (t.type === 'income' ? t.amount : (t.type === 'expense' ? -t.amount : 0)), 0);
-        const homeContainer = document.getElementById('tx-container');
-        homeContainer.innerHTML = `<div class="daily-summary-card"><span class="daily-summary-date">${viewingDate.getFullYear()}/${String(viewingDate.getMonth()+1).padStart(2,'0')}/${String(viewingDate.getDate()).padStart(2,'0')} ${weekDays[viewingDate.getDay()]}</span><span class="daily-summary-total ${dailyNet < 0 ? 'neg' : (dailyNet > 0 ? 'pos' : 'zero')}">$ ${dailyNet > 0 ? '+' : ''}${dailyNet.toLocaleString()}</span></div>`;
-        if (!homeTx.length) homeContainer.insertAdjacentHTML('beforeend', '<div style="text-align:center; padding: 20px; color: var(--text-light); font-size: 14px;">當日無交易紀錄</div>');
-        else homeTx.forEach(t => homeContainer.insertAdjacentHTML('beforeend', generateTxHTML(t)));
-
-        // 明細頁
         renderDetailsPage();
 
-        // 查帳頁
         const rangeInfo = getLedgerRangeInfo(), isInc = ledgerFlowType === 'income', flowLabel = isInc ? '收入' : '支出';
         document.getElementById('ledger-income-label').innerText = `${rangeInfo.labelPrefix}總收入`;
         document.getElementById('ledger-expense-label').innerText = `${rangeInfo.labelPrefix}總支出`;
@@ -1092,7 +1024,7 @@
             let sumFlow = displayTx.reduce((s, t) => s + t.amount, 0);
             ledgerContainer.innerHTML = `<div class="daily-summary-card"><span class="daily-summary-date">${rangeInfo.rangeTitle}</span><span class="daily-summary-total ${sumFlow > 0 ? (isInc ? 'pos' : 'neg') : 'zero'}">$ ${sumFlow > 0 ? (isInc ? '+' : '-') : ''}${sumFlow.toLocaleString()}</span></div>`;
             if (!displayTx.length) ledgerContainer.insertAdjacentHTML('beforeend', `<div style="text-align:center; padding: 20px; color: var(--text-light); font-size: 14px;">查無${flowLabel}紀錄</div>`);
-            else displayTx.forEach(t => ledgerContainer.insertAdjacentHTML('beforeend', generateTxHTML(t)));
+            else displayTx.forEach(t => ledgerContainer.insertAdjacentHTML('beforeend', generateTxHTML(t, false)));
         }
     }
 
@@ -1129,9 +1061,9 @@
             if (currentType === 'transfer') { newTx.fromAcc = fAcc; newTx.toAcc = tAcc; } else newTx.singleAcc = acc;
             db.transactions.push(newTx);
         }
-        saveDB(); viewingDate = new Date(txTs); formatViewingDate(); closeModal(); switchPage('home');
-        isHistoryExpanded = true; document.getElementById('tx-container').classList.add('expanded'); document.getElementById('history-header').classList.add('open');
-        renderApp(); setTimeout(() => document.getElementById('tx-container').scrollIntoView({ behavior: 'smooth', block: 'end' }), 350);
+        saveDB(); viewingDate = new Date(txTs); formatViewingDate(); closeModal();
+        if (currentPage === 'details') renderApp();
+        else switchPage('details');
     }
 
     function openModal() {
