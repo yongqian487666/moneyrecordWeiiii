@@ -363,7 +363,6 @@
         <div class="dashboard">
             <h2>淨累積資產 TWD</h2>
             <div id="total-balance-display">0</div>
-            <div class="home-analysis" id="home-analysis"></div>
             <div class="chart-container"><canvas id="myChart"></canvas></div>
             <div class="pie-legend" id="pie-legend"></div>
         </div>
@@ -430,7 +429,7 @@
 
     <!-- 3. 明細頁 -->
     <div class="page" id="page-details">
-        <h2 style="text-align: center; margin-bottom: 14px; font-weight: bold; color: var(--text-main);">每日明細</h2>
+        <h2 style="text-align: center; margin-bottom: 14px; font-weight: bold; color: var(--text-main);">明細</h2>
         <div class="details-controls-card">
             <div class="time-range-btns">
                 <button class="time-btn active" id="btn-det-range-1" onclick="setDetailsRange(1)">今日</button>
@@ -873,53 +872,7 @@
         else { viewingDate = new Date(y, m, d); formatViewingDate(); closeCalendar(); renderApp(); }
     }
 
-    // 首頁總資產分析語（以頂部日期為截止日）
-    function updateHomeAnalysis(balObj, endOfDayMs) {
-        const el = document.getElementById('home-analysis');
-        const entries = accKeys.map(k => ({ name: accNames[k], val: balObj[k] }));
-        const sum = entries.reduce((a, b) => a + b.val, 0);
-        const y = viewingDate.getFullYear(), m = viewingDate.getMonth();
-        const mStart = new Date(y, m, 1, 0, 0, 0, 0).getTime();
-        const mdStr = `${String(m + 1).padStart(2, '0')}/${String(viewingDate.getDate()).padStart(2, '0')}`;
-
-        const monthTx = db.transactions.filter(t => t.type !== 'adjust' && t.timestamp >= mStart && t.timestamp <= endOfDayMs);
-        let mInc = 0, mExp = 0;
-        const catExp = {};
-        monthTx.forEach(t => {
-            if (t.type === 'income') mInc += t.amount;
-            if (t.type === 'expense') {
-                mExp += t.amount;
-                const c = t.category || '吃';
-                catExp[c] = (catExp[c] || 0) + t.amount;
-            }
-        });
-
-        const hasAnyTx = db.transactions.some(t => t.timestamp <= endOfDayMs);
-        if (!hasAnyTx && sum === 0) {
-            el.innerHTML = `截至 <strong>${mdStr}</strong> 尚無紀錄，點下方「+」或到設置校正餘額開始記帳吧 ✨`;
-            return;
-        }
-
-        const net = mInc - mExp;
-        const netHtml = net >= 0 ? `<span class="pos">+${net.toLocaleString()}</span>` : `<span class="neg">${net.toLocaleString()}</span>`;
-        let line1 = `截至 <strong>${mdStr}</strong>，本月收支結餘 ${netHtml}（收 ${mInc.toLocaleString()} / 支 ${mExp.toLocaleString()}）`;
-
-        let line2Parts = [];
-        const positiveEntries = entries.filter(e => e.val > 0).sort((a, b) => b.val - a.val);
-        if (positiveEntries.length > 0 && sum > 0) {
-            const topAcc = positiveEntries[0];
-            const pct = Math.round((topAcc.val / sum) * 100);
-            line2Parts.push(`主力帳戶為 <strong>${topAcc.name}</strong>（佔 ${pct}%）`);
-        }
-        const topCat = Object.entries(catExp).sort((a, b) => b[1] - a[1])[0];
-        if (topCat) {
-            const emoji = getCategoryObj(topCat[0], 'expense').emoji;
-            line2Parts.push(`本月最常花在 <strong>${topCat[0]}</strong> ${emoji}`);
-        } else {
-            line2Parts.push(`本月目前零支出，守財超棒！`);
-        }
-        el.innerHTML = `${line1}<br>${line2Parts.join('，')}`;
-    }
+    
 
     function updateChart(balObj) {
         const ctx = document.getElementById('myChart'), isDark = document.body.classList.contains('dark-mode');
@@ -1162,7 +1115,6 @@
         const endOfDayMs = new Date(viewingDate).setHours(23, 59, 59, 999);
         const { bal } = calculateCurrentBalances(endOfDayMs);
         updateChart(bal);
-        updateHomeAnalysis(bal, endOfDayMs);
 
         document.getElementById('acc-post-val').innerText = bal.post.toLocaleString();
         document.getElementById('acc-cash-val').innerText = bal.cash.toLocaleString();
