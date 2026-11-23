@@ -330,7 +330,8 @@
         .loader-overlay { display: none !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #e5f5ff, #f6f7f8); z-index: 2000; justify-content: center; align-items: center; }
         body.dark-mode .loader-overlay { background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom)); }
         .loader-overlay.show { display: flex !important; }
-        .loader-icon { font-size: 110px; color: #ffffff; text-shadow: 0 4px 18px rgba(110, 193, 242, 0.55); line-height: 110px; animation: naturalSpin 2.5s ease-in-out infinite; }
+        .loader-icon { font-size: 110px; color: #000000; line-height: 110px; animation: naturalSpin 2.5s ease-in-out infinite; }
+        body.dark-mode .loader-icon { color: #f0f0f0; }
         @keyframes naturalSpin { 0% { transform: rotate(0deg) scale(0.9); opacity: 0.8; } 50% { transform: rotate(180deg) scale(1.15); opacity: 1; } 100% { transform: rotate(360deg) scale(0.9); opacity: 0.8; } }
         .hidden { display: none !important; }
     </style>
