@@ -87,12 +87,6 @@
         .dashboard { background: var(--card-bg); border: 1.5px solid var(--card-border); border-radius: 22px; padding: 20px; text-align: center; box-shadow: var(--card-shadow); margin-bottom: 15px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
         .dashboard h2 { font-size: 17px; font-weight: bold; color: var(--text-light); margin-bottom: 5px; }
         #total-balance-display { font-size: 38px; font-weight: 900; color: var(--accent); letter-spacing: 0.5px; margin-bottom: 12px; }
-        .home-analysis { background: rgba(255, 255, 255, 0.65); border: 1px solid var(--card-border); border-radius: 14px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: var(--text-light); line-height: 1.6; text-align: left; }
-        body.dark-mode .home-analysis { background: rgba(0, 0, 0, 0.2); }
-        .home-analysis strong { color: var(--text-main); font-weight: bold; }
-        .home-analysis .pos { color: #3a9ad9; font-weight: bold; }
-        body.dark-mode .home-analysis .pos { color: var(--accent); }
-        .home-analysis .neg { color: var(--expense); font-weight: bold; }
 
         .chart-container { position: relative; height: 220px; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 8px; }
         .pie-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; text-align: left; padding: 12px 14px; background: rgba(255, 255, 255, 0.55); border-radius: 14px; border: 1px solid var(--card-border); }
@@ -558,6 +552,8 @@
                     </div>
                 </div>
             </div>
+            <div class="form-group" id="group-category"><label>類別</label><div class="category-grid" id="category-grid"></div></div>
+            <div class="form-group"><label>備註</label><input type="text" id="tx-note" placeholder="輸入項目（選填）" onfocus="closeCalc()"></div>
             <div class="form-group" id="group-amount">
                 <label>金額 (TWD)</label>
                 <input type="text" id="tx-amount" placeholder="輸入金額" readonly onclick="openCalc()">
@@ -583,8 +579,6 @@
                     <button type="button" class="calc-btn op" onclick="calcPress('-')">-</button>
                 </div>
             </div>
-            <div class="form-group" id="group-category"><label>類別</label><div class="category-grid" id="category-grid"></div></div>
-            <div class="form-group"><label>備註</label><input type="text" id="tx-note" placeholder="輸入項目（選填）" onfocus="closeCalc()"></div>
             <div class="action-buttons"><button class="btn-cancel" onclick="closeModal()">取消</button><button class="btn-submit" id="btn-save-tx" onclick="saveTransaction()">記錄</button></div>
         </div>
     </div>
@@ -660,12 +654,12 @@
         { name: '吃', emoji: '🍚', color: '#e65c72' },
         { name: '喝', emoji: '🧋', color: '#eb8f47' },
         { name: '玩', emoji: '🎠', color: '#f3b749' },
-        { name: 'svt', emoji: '💎', color: '#92a8d1' },
         { name: '購物', emoji: '🛍️', color: '#e16eb8' },
         { name: '交通', emoji: '🚗', color: '#5a94f0' },
         { name: '學習', emoji: '📖', color: '#4794a8' },
         { name: '繳費', emoji: '💰', color: '#9c78eb' },
-        { name: '生活', emoji: '🛁', color: '#61d095' }
+        { name: '生活', emoji: '🛁', color: '#61d095' },
+        { name: '其他', emoji: '➖', color: '#a8b0b8' }
     ];
     const incomeCategories = [
         { name: '生活費', emoji: '🌱', color: '#61d095' },
@@ -689,7 +683,7 @@
     function toDateKey(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
     function getCategoryObj(catName, type) {
         const list = type === 'income' ? incomeCategories : expenseCategories;
-        return list.find(c => c.name === catName) || expenseCategories.find(c => c.name === catName) || incomeCategories.find(c => c.name === catName) || { name: '其他', emoji: '➕', color: '#a8b0b8' };
+        return list.find(c => c.name === catName) || expenseCategories.find(c => c.name === catName) || incomeCategories.find(c => c.name === catName) || { name: '其他', emoji: type === 'income' ? '➕' : '➖', color: '#a8b0b8' };
     }
 
     function renderAccountGrid() {
@@ -720,7 +714,12 @@
         });
     }
 
-    function openCalc() { document.getElementById('calc-pad').classList.add('show'); document.getElementById('tx-amount').classList.add('calc-focused'); }
+    function openCalc() {
+        const pad = document.getElementById('calc-pad');
+        pad.classList.add('show');
+        document.getElementById('tx-amount').classList.add('calc-focused');
+        setTimeout(() => pad.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+    }
     function evaluateCalcExpr(raw) {
         if (!raw) return '';
         let expr = String(raw).replace(/×/g, '*').replace(/÷/g, '/').replace(/[^0-9+\-*/.]/g, '').replace(/[+\-*/.]+$/, '');
@@ -769,7 +768,7 @@
     function handleUrlParams() {
         const p = new URLSearchParams(window.location.search);
         if (p.get('action') === 'add') {
-            const amount = parseFloat(p.get('amount')), note = p.get('note') || '', type = p.get('type') || 'expense', acc = p.get('acc') || 'cash', cat = p.get('category') || (type === 'income' ? '其他' : '吃');
+            const amount = parseFloat(p.get('amount')), note = p.get('note') || '', type = p.get('type') || 'expense', acc = p.get('acc') || 'cash', cat = p.get('category') || '其他';
             if (amount) {
                 db.transactions.push({ id: Date.now(), timestamp: Date.now(), type, amount, category: type === 'transfer' ? '轉帳' : cat, note, singleAcc: acc });
                 saveDB(); window.history.replaceState(null, '', window.location.pathname);
@@ -885,8 +884,6 @@
         else { viewingDate = new Date(y, m, d); formatViewingDate(); closeCalendar(); renderApp(); }
     }
 
-    
-
     function updateChart(balObj) {
         const ctx = document.getElementById('myChart'), isDark = document.body.classList.contains('dark-mode');
         const dataVals = [balObj.post, balObj.cash, balObj.jko, balObj.easycard];
@@ -953,7 +950,7 @@
 
         if (ledgerChartType === 'pie') {
             const catMap = {}; let total = 0;
-            flowTx.forEach(tx => { const c = tx.category || (isInc ? '其他' : '吃'); catMap[c] = (catMap[c] || 0) + tx.amount; total += tx.amount; });
+            flowTx.forEach(tx => { const c = tx.category || '其他'; catMap[c] = (catMap[c] || 0) + tx.amount; total += tx.amount; });
             const sortedCats = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
             const labels = sortedCats.length ? sortedCats.map(c => c[0]) : [`無${flowLabel}`];
             const dataVals = sortedCats.length ? sortedCats.map(c => c[1]) : [1];
@@ -1056,7 +1053,6 @@
         return txList;
     }
 
-    // 明細頁區間與篩選控制
     function setDetailsRange(days) {
         detailsRangeDays = days;
         document.querySelectorAll('#page-details .time-btn').forEach(b => b.classList.remove('active'));
@@ -1258,7 +1254,7 @@
             const item = { id: tx.id, timestamp: tx.timestamp, type: tx.type, amount: tx.amount, note: tx.note || '' };
             if (tx.type === 'adjust') { item.singleAcc = tx.singleAcc; if (tx.prevAmount != null) item.prevAmount = tx.prevAmount; }
             else if (tx.type === 'transfer') { item.category = '轉帳'; item.fromAcc = tx.fromAcc; item.toAcc = tx.toAcc; }
-            else { item.category = tx.category || (tx.type === 'income' ? '其他' : '吃'); item.singleAcc = tx.singleAcc; }
+            else { item.category = tx.category || '其他'; item.singleAcc = tx.singleAcc; }
             return item;
         });
         const url = URL.createObjectURL(new Blob([JSON.stringify({ transactions: cleanTx }, null, 2)], { type: 'application/json' }));
@@ -1277,7 +1273,7 @@
             if (!parsed || !Array.isArray(parsed.transactions)) { e.target.value = ''; showAlert('檔案格式不正確喔！'); return; }
             db = {
                 transactions: parsed.transactions.map(tx => {
-                    if ((tx.type === 'expense' || tx.type === 'income') && !tx.category) tx.category = tx.type === 'income' ? '其他' : '吃';
+                    if ((tx.type === 'expense' || tx.type === 'income') && !tx.category) tx.category = '其他';
                     return tx;
                 })
             };
